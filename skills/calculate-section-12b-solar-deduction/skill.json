@@ -1,0 +1,34 @@
+{
+  "name": "calculate-section-12b-solar-deduction",
+  "version": "0.1.0",
+  "description": "Calculate the South African Section 12B renewable-energy (solar PV) tax deduction and real cash saving for a business taxpayer.",
+  "jurisdiction": ["ZA"],
+  "category": "tax-incentive",
+  "regulators": ["SARS"],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "alpha",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "Obtain a valid Certificate of Compliance (CoC) from a registered electrician",
+    "Itemise equipment separately from labour on the supplier invoice",
+    "Confirm commissioning date falls in the intended tax year",
+    "Have a registered tax practitioner confirm the claim before filing"
+  ],
+  "estimated_completion_time": "Instant (calculation only)",
+  "estimated_cost_zar": 0,
+  "tools_exposed": [
+    "calculate_deduction",
+    "compare_12b_vs_12ba",
+    "check_eligibility",
+    "get_status"
+  ],
+  "rule_basis": "Income Tax Act s12B (live, permanent); s12BA (expired 28 Feb 2025)",
+  "last_rule_check": "2026-06",
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/calculate-section-12b-solar-deduction",
+  "support_email": "skills@theaquariusfoundation.org"
+}

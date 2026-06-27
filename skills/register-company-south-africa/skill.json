@@ -1,0 +1,37 @@
+{
+  "name": "register-company-south-africa",
+  "version": "0.1.0",
+  "description": "Register a private company (Pty Ltd) in South Africa via the Companies and Intellectual Property Commission (CIPC).",
+  "jurisdiction": ["ZA"],
+  "category": "company-formation",
+  "regulators": ["CIPC"],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [
+    "CIPC_USERNAME",
+    "CIPC_PASSWORD"
+  ],
+  "requires_human_steps": [
+    "Director identity verification (in-person at SAPS or via accredited verifier such as Lexis Refinitiv)",
+    "Signing of the Memorandum of Incorporation (MOI) by all directors",
+    "B-BBEE EME affidavit signature before a Commissioner of Oaths"
+  ],
+  "estimated_completion_time": "10–14 business days",
+  "estimated_cost_zar": 225,
+  "tools_exposed": [
+    "check_name_availability",
+    "reserve_name",
+    "estimate_costs",
+    "prepare_filing",
+    "submit_registration",
+    "check_registration_status",
+    "get_status"
+  ],
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/register-company-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}
