@@ -8,7 +8,7 @@ Part of [MIA — Made in Africa](https://mia-capital-advisor.onrender.com), the 
 
 ## Why this exists
 
-There are dozens of agentic AI tools today. None of them know how to register a Pty Ltd in South Africa, open a USD account in Lagos, file an AfDB grant, navigate SARB exchange controls, or claim Section 12J credits. African founders coordinate this knowledge in WhatsApp groups, Notion pages, and tribal memory.
+There are dozens of agentic AI tools today. None of them know how to register a Pty Ltd in South Africa, open a USD account in Lagos, file an AfDB grant, navigate SARB exchange controls, or claim a Section 12B solar deduction. African founders coordinate this knowledge in WhatsApp groups, Notion pages, and tribal memory.
 
 This repo turns that tribal knowledge into composable, AI-callable skills. Anyone can contribute. Every successful execution improves the next one.
 
@@ -31,7 +31,7 @@ git clone https://github.com/aquariusfoundation/mia-skills
 cd mia-skills
 
 # Install a skill
-cd skills/register-company-south-africa
+cd skills/calculate-turnover-tax-south-africa
 pip install -e .
 
 # Run as MCP server
@@ -42,21 +42,34 @@ python server.py
 
 See [`docs/integration.md`](docs/integration.md) for connecting to Claude Desktop, Cursor, ChatGPT, and custom agents.
 
-## Available skills (v0.1)
+## Available skills
 
-| Skill | Jurisdiction | Status | Maintainer |
-|---|---|---|---|
-| `calculate-section-12b-solar-deduction` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | @aquariusfoundation |
-| `register-company-south-africa` | 🇿🇦 South Africa (CIPC) | Scaffold | @aquariusfoundation |
-| `open-usd-account-mercury` | 🇺🇸 via 🇿🇦 | Planned | — |
-| `file-afdb-grant` | Pan-African (AfDB) | Planned | — |
-| `navigate-sarb-exchange-control` | 🇿🇦 South Africa | Planned | — |
-| `claim-section-12j` | 🇿🇦 South Africa | Planned | — |
-| `integrate-mpesa` | 🇰🇪 Kenya | Planned | — |
-| `register-company-nigeria` | 🇳🇬 Nigeria (CAC) | Planned | — |
-| `register-company-kenya` | 🇰🇪 Kenya (BRS) | Planned | — |
-| `register-company-rwanda` | 🇷🇼 Rwanda (RDB) | Planned | — |
-| `apply-afcfta-tariff-preference` | Pan-African (AfCFTA) | Planned | — |
+**Working (alpha)** = every tool implemented, every constant verified against the live primary source (date in each skill's `last_rule_check`). **Scaffold** = honest stubs: stable tool signatures that return structured not-implemented responses, no invented regulatory figures. Last updated: 27 July 2026.
+
+| Skill | Jurisdiction | Status | Tests | Maintainer |
+|---|---|---|---|---|
+| `calculate-section-12b-solar-deduction` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 21 | @aquariusfoundation |
+| `calculate-turnover-tax-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 31 | @aquariusfoundation |
+| `check-vat-registration-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 19 | @aquariusfoundation |
+| `calculate-paye-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 21 | @aquariusfoundation |
+| `register-company-south-africa` | 🇿🇦 South Africa (CIPC) | Scaffold | 13 | @aquariusfoundation |
+| `reserve-company-name-south-africa` | 🇿🇦 South Africa (CIPC) | Scaffold | 4 | @aquariusfoundation |
+| `file-annual-return-south-africa` | 🇿🇦 South Africa (CIPC) | Scaffold | 4 | @aquariusfoundation |
+| `register-uif-south-africa` | 🇿🇦 South Africa (Employment & Labour) | Scaffold | 4 | @aquariusfoundation |
+| `apply-tax-clearance-south-africa` | 🇿🇦 South Africa (SARS) | Scaffold | 4 | @aquariusfoundation |
+| `generate-bbbee-affidavit-south-africa` | 🇿🇦 South Africa (the dtic) | Scaffold | 4 | @aquariusfoundation |
+| `check-grant-eligibility-seda-sefa` | 🇿🇦 South Africa (SEDA/SEFA) | Scaffold | 4 | @aquariusfoundation |
+| `calculate-carbon-tax-south-africa` | 🇿🇦 South Africa (SARS) | Scaffold | 4 | @aquariusfoundation |
+| `register-company-kenya` | 🇰🇪 Kenya (BRS) | Scaffold | 4 | @aquariusfoundation |
+| `register-company-nigeria` | 🇳🇬 Nigeria (CAC) | Scaffold | 4 | @aquariusfoundation |
+| `lookup-afcfta-tariff-preference` | Pan-African (AfCFTA) | Scaffold | 4 | @aquariusfoundation |
+| `open-usd-account-mercury` | 🇺🇸 via 🇿🇦 | Planned | — | — |
+| `file-afdb-grant` | Pan-African (AfDB) | Planned | — | — |
+| `navigate-sarb-exchange-control` | 🇿🇦 South Africa | Planned | — | — |
+| `integrate-mpesa` | 🇰🇪 Kenya | Planned | — | — |
+| `register-company-rwanda` | 🇷🇼 Rwanda (RDB) | Planned | — | — |
+
+145 tests passing across the library. (The previously listed `claim-section-12j` was removed: the Section 12J VCC regime sunset on 30 June 2021 and is not coming back.)
 
 Want to contribute a skill? See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 

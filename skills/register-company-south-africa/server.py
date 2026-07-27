@@ -42,7 +42,9 @@ class Director(BaseModel):
     """A director of the proposed company."""
 
     full_name: str = Field(..., min_length=2, description="Full legal name as on ID")
-    id_number: str = Field(..., description="13-digit RSA ID or passport number for foreign nationals")
+    id_number: str = Field(
+        ..., description="13-digit RSA ID or passport number for foreign nationals"
+    )
     nationality: str = Field(default="South African")
     residential_address: str = Field(..., min_length=10)
     email: EmailStr
@@ -70,8 +72,12 @@ class CompanyRegistration(BaseModel):
     directors: list[Director] = Field(..., min_length=1, max_length=20)
     registered_address: str = Field(..., min_length=10)
     financial_year_end: Literal["February", "June", "December"] = "February"
-    share_capital: int = Field(default=1000, ge=1, description="Number of ordinary shares to authorize")
-    main_business_activity: str = Field(..., min_length=10, description="One sentence describing the business")
+    share_capital: int = Field(
+        default=1000, ge=1, description="Number of ordinary shares to authorize"
+    )
+    main_business_activity: str = Field(
+        ..., min_length=10, description="One sentence describing the business"
+    )
 
 
 # ─── Standard output envelope ──────────────────────────────────────────────────
@@ -162,7 +168,8 @@ async def estimate_costs(
     """
     cipc_registration = 175.0
     name_reservation = 50.0
-    bee_certificate = 0.0 if include_bee_certificate else 0.0  # EME certificates are free for sub-R10m turnover
+    # EME certificates are free below the EME turnover threshold
+    bee_certificate = 0.0 if include_bee_certificate else 0.0
     tax_registration = 0.0 if include_tax_registration else 0.0  # automatic via CIPC
 
     total = cipc_registration + name_reservation + bee_certificate + tax_registration

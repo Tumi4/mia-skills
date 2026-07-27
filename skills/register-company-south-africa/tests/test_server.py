@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
-from pydantic import ValidationError
-
 # Import the server module from parent directory
 import sys
 from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -17,10 +17,8 @@ from server import (
     check_name_availability,
     estimate_costs,
     get_status,
-    prepare_filing,
     submit_registration,
 )
-
 
 # ─── Model validation tests ────────────────────────────────────────────────────
 
