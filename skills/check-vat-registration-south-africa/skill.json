@@ -1,0 +1,32 @@
+{
+  "name": "check-vat-registration-south-africa",
+  "version": "0.1.0",
+  "description": "Determine whether a South African business must or may register for VAT under the post-Budget-2026 thresholds, and estimate a simple VAT payable/refund position at 15%.",
+  "jurisdiction": ["ZA"],
+  "category": "tax-compliance",
+  "regulators": ["SARS"],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "alpha",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "Complete the actual VAT registration on SARS eFiling or at a SARS branch",
+    "Confirm taxable-supply classification (exempt / zero-rated) with a registered tax practitioner",
+    "Prepare actual VAT201 returns from full records - the position tool is an estimate only"
+  ],
+  "estimated_completion_time": "Instant (determination/calculation only)",
+  "estimated_cost_zar": 0,
+  "tools_exposed": [
+    "check_registration_required",
+    "estimate_vat_position",
+    "get_status"
+  ],
+  "rule_basis": "VAT registration tests per SARS: compulsory above R2.3m taxable supplies in any consecutive 12 months, voluntary above R120,000 (both effective 1 April 2026, Budget 2026); VAT rate 15% (2025 proposed increases reversed 24 April 2025)",
+  "last_rule_check": "2026-07",
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/check-vat-registration-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}
