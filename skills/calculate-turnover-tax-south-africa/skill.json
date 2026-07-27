@@ -1,0 +1,33 @@
+{
+  "name": "calculate-turnover-tax-south-africa",
+  "version": "0.1.0",
+  "description": "Calculate South African turnover tax for micro businesses (annual turnover up to R2.3m), check qualification, and compare against the standard tax regime.",
+  "jurisdiction": ["ZA"],
+  "category": "tax-calculation",
+  "regulators": ["SARS"],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "alpha",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "Register for turnover tax with SARS (form TT01 / eFiling) - registration windows apply",
+    "Confirm the not_checked Sixth Schedule rules (capital disposals, partnership edge rules) with a registered tax practitioner",
+    "Confirm the regime choice with a registered tax practitioner before electing turnover tax"
+  ],
+  "estimated_completion_time": "Instant (calculation only)",
+  "estimated_cost_zar": 0,
+  "tools_exposed": [
+    "calculate_turnover_tax",
+    "check_eligibility",
+    "compare_vs_standard_tax",
+    "get_status"
+  ],
+  "rule_basis": "Sixth Schedule to the Income Tax Act (turnover tax); SARS 2027 + 2026 rate tables; Budget 2026 qualifying-limit increase to R2.3m (SARS effective date 1 April 2026)",
+  "last_rule_check": "2026-07",
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/calculate-turnover-tax-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}
