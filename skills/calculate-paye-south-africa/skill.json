@@ -1,0 +1,32 @@
+{
+  "name": "calculate-paye-south-africa",
+  "version": "0.1.0",
+  "description": "Calculate monthly PAYE, UIF employee contribution and take-home pay for a South African salary, using the 2027-year tax table, age-based rebates and medical scheme fees tax credits.",
+  "jurisdiction": ["ZA"],
+  "category": "tax-calculation",
+  "regulators": ["SARS"],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "alpha",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "Employer PAYE registration with SARS, monthly declarations and payment deadlines",
+    "UIF registration with the Department of Employment and Labour (separate from SARS-collected contributions)",
+    "Payroll-provider or practitioner confirmation for bonuses, allowances, fringe benefits and retirement deductions"
+  ],
+  "estimated_completion_time": "Instant (calculation only)",
+  "estimated_cost_zar": 0,
+  "tools_exposed": [
+    "calculate_monthly_paye",
+    "calculate_annual_summary",
+    "get_status"
+  ],
+  "rule_basis": "2027 individual tax table, rebates (R17,820/R9,765/R3,249) and thresholds; 2027 Medical Scheme Fees Tax Credit (R376/R752/R254 pm); UIF 1% employee + 1% employer with R17,712 pm ceiling (from 1 June 2021)",
+  "last_rule_check": "2026-07",
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/calculate-paye-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}
