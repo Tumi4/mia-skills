@@ -1,0 +1,34 @@
+{
+  "name": "lookup-afcfta-tariff-preference",
+  "version": "0.1.0",
+  "description": "Look up AfCFTA preferential tariff treatment and rules of origin for a product and trade lane. (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "AfCFTA"
+  ],
+  "category": "trade",
+  "regulators": [
+    "AfCFTA"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "Certificates of origin are issued by national designated authorities - a human/institutional step"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "lookup_tariff_preference",
+    "check_rules_of_origin",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: Tariff phase-down schedules differ per state party and product; several rules-of-origin chapters remain under negotiation - all of it requires research against the AfCFTA e-Tariff Book rather than assumption.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/lookup-afcfta-tariff-preference",
+  "support_email": "skills@theaquariusfoundation.org"
+}

@@ -1,0 +1,34 @@
+{
+  "name": "generate-bbbee-affidavit-south-africa",
+  "version": "0.1.0",
+  "description": "Generate a B-BBEE sworn affidavit for an Exempted Micro Enterprise (EME) or qualifying start-up. (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "ZA"
+  ],
+  "category": "compliance-document",
+  "regulators": [
+    "dtic"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "The affidavit must be sworn before a Commissioner of Oaths - always a human step"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "check_eme_qualification",
+    "generate_affidavit",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: The EME turnover threshold, start-up recognition rules and current official affidavit templates require research against the live dtic codes of good practice.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/generate-bbbee-affidavit-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}

@@ -1,0 +1,36 @@
+{
+  "name": "register-company-kenya",
+  "version": "0.1.0",
+  "description": "Register a private limited company in Kenya via BRS/eCitizen. (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "KE"
+  ],
+  "category": "company-formation",
+  "regulators": [
+    "BRS"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [
+    "ECITIZEN_ACCOUNT"
+  ],
+  "requires_human_steps": [
+    "eCitizen identity onboarding; director KYC per Kenyan requirements"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "check_name_availability",
+    "prepare_registration",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: Current BRS fees, form names and processing timelines require research against live BRS/eCitizen sources - Kenyan figures are deliberately absent rather than guessed.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/register-company-kenya",
+  "support_email": "skills@theaquariusfoundation.org"
+}

@@ -1,0 +1,43 @@
+[project]
+name = "mia-generate-bbbee-affidavit-south-africa"
+version = "0.1.0"
+description = "MIA skill (SCAFFOLD): Generate a B-BBEE sworn affidavit for an Exempted Micro Enterprise (EME) or qualifying start-up."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "The Aquarius Foundation", email = "skills@theaquariusfoundation.org" }
+]
+keywords = ["mcp", "mia", "africa", "scaffold", "za", "dtic"]
+dependencies = [
+    "fastmcp>=0.2.0",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# This skill is a flat single-module layout (server.py at the skill root, no package
+# folder). Hatchling's default wheel heuristic looks for a directory matching the project
+# name and fails when it can't find one, so we tell it explicitly which file to ship.
+[tool.hatch.build.targets.wheel]
+include = ["server.py"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

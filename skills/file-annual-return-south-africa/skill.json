@@ -1,0 +1,38 @@
+{
+  "name": "file-annual-return-south-africa",
+  "version": "0.1.0",
+  "description": "File a company annual return with the South African CIPC. (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "ZA"
+  ],
+  "category": "compliance-filing",
+  "regulators": [
+    "CIPC"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [
+    "CIPC_USERNAME",
+    "CIPC_PASSWORD"
+  ],
+  "requires_human_steps": [
+    "Annual financial statements or FAS may need to accompany the return depending on company type"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "check_due_date",
+    "calculate_filing_fee",
+    "file_annual_return",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: The CIPC annual-return fee table (turnover bands and amounts) and late-filing penalties require research against the live CIPC schedule.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/file-annual-return-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}

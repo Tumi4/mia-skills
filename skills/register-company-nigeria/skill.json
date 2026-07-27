@@ -1,0 +1,36 @@
+{
+  "name": "register-company-nigeria",
+  "version": "0.1.0",
+  "description": "Register a private limited company in Nigeria via the CAC. (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "NG"
+  ],
+  "category": "company-formation",
+  "regulators": [
+    "CAC"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [
+    "CAC_PORTAL_ACCOUNT"
+  ],
+  "requires_human_steps": [
+    "Director identification (NIN) and any attestation requirements per current CAC practice"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "check_name_availability",
+    "prepare_registration",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: Current CAC fees, stamp-duty treatment, form names and timelines require research against live CAC sources - Nigerian figures are deliberately absent rather than guessed.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/register-company-nigeria",
+  "support_email": "skills@theaquariusfoundation.org"
+}

@@ -1,0 +1,37 @@
+{
+  "name": "reserve-company-name-south-africa",
+  "version": "0.1.0",
+  "description": "Reserve a company name with the South African CIPC (COR9.1 flow). (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "ZA"
+  ],
+  "category": "company-formation",
+  "regulators": [
+    "CIPC"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [
+    "CIPC_USERNAME",
+    "CIPC_PASSWORD"
+  ],
+  "requires_human_steps": [
+    "CIPC e-services account creation and login are browser-only today"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "check_name_availability",
+    "reserve_name",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: Current CIPC name-reservation fee and reservation validity period require research on the live CIPC fee schedule - do not assume the commonly quoted figures.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/reserve-company-name-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}

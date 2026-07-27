@@ -1,0 +1,34 @@
+{
+  "name": "register-uif-south-africa",
+  "version": "0.1.0",
+  "description": "Register an employer (and employees) for UIF with the Department of Employment and Labour. (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "ZA"
+  ],
+  "category": "employer-compliance",
+  "regulators": [
+    "Department of Employment and Labour"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "u-Filing account activation currently involves identity verification steps"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "check_registration_obligation",
+    "prepare_registration",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: Registration forms (e.g. UI-8/UI-19), employee-hours thresholds and domestic-employer rules require research against the Department of Employment and Labour's current pages.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/register-uif-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}

@@ -1,0 +1,37 @@
+{
+  "name": "apply-tax-clearance-south-africa",
+  "version": "0.1.0",
+  "description": "Apply for a SARS Tax Compliance Status (tax clearance) PIN. (SCAFFOLD - not yet implemented)",
+  "jurisdiction": [
+    "ZA"
+  ],
+  "category": "tax-compliance",
+  "regulators": [
+    "SARS"
+  ],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "scaffold",
+  "requires_credentials": [
+    "SARS_EFILING_USERNAME",
+    "SARS_EFILING_PASSWORD"
+  ],
+  "requires_human_steps": [
+    "Outstanding returns or tax debt must be resolved by a human before a TCS PIN will issue"
+  ],
+  "estimated_completion_time": "requires research",
+  "estimated_cost_zar": null,
+  "tools_exposed": [
+    "check_compliance_readiness",
+    "request_tcs_pin",
+    "get_status"
+  ],
+  "rule_basis": "None encoded yet - scaffold. Research needed: Current TCS request types and their criteria require research on the live SARS TCS pages.",
+  "last_rule_check": null,
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/apply-tax-clearance-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}
