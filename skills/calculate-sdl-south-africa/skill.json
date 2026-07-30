@@ -1,0 +1,32 @@
+{
+  "name": "calculate-sdl-south-africa",
+  "version": "0.1.0",
+  "description": "Calculate the South African Skills Development Levy (1% of payroll) and check employer liability against the R500,000 exemption threshold.",
+  "jurisdiction": ["ZA"],
+  "category": "tax-calculation",
+  "regulators": ["SARS"],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "alpha",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "SDL registration with SARS runs through the employer registration processes alongside PAYE",
+    "Monthly employer declaration and payment to SARS",
+    "Confirm which pay items form the leviable amount, and revisit the forward-looking R500,000 estimate when pay or headcount changes"
+  ],
+  "estimated_completion_time": "Instant (calculation only)",
+  "estimated_cost_zar": 0,
+  "tools_exposed": [
+    "check_sdl_liability",
+    "calculate_sdl",
+    "get_status"
+  ],
+  "rule_basis": "Skills Development Levies Act as administered by SARS: 1% of the leviable amount; R500,000 next-12-months exemption; public-sector and exempt-organisation categories",
+  "last_rule_check": "2026-07",
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/calculate-sdl-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}
