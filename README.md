@@ -1,5 +1,7 @@
 # mia-skills
 
+[![CI](https://github.com/Tumi4/mia-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/Tumi4/mia-skills/actions/workflows/ci.yml)
+
 **Africa-first action skills for AI agents.** Open-source MCP servers that let any AI tool — Claude, ChatGPT, Cursor, your own agent — actually *do* things in African operational reality. Register companies. Open bank accounts. File grants. Navigate regulators. Integrate payment rails.
 
 Part of [MIA — Made in Africa](https://mia-capital-advisor.onrender.com), the operating system for African entrepreneurship.
@@ -25,6 +27,10 @@ A skill is a self-contained MCP (Model Context Protocol) server that exposes one
 
 ## Quick start
 
+**Zero-setup (hosted):** add the gateway URL as a custom connector in Claude — one URL serves every live skill. See [`deploy/gateway/README.md`](deploy/gateway/README.md).
+
+**Run a skill yourself:**
+
 ```bash
 # Clone
 git clone https://github.com/aquariusfoundation/mia-skills
@@ -40,11 +46,11 @@ python server.py
 # Or connect from Claude Desktop, Cursor, etc. via mcp.json config
 ```
 
-See [`docs/integration.md`](docs/integration.md) for connecting to Claude Desktop, Cursor, ChatGPT, and custom agents.
+See [`docs/integration.md`](docs/integration.md) for Claude Desktop, Cursor, the hosted gateway, and custom agents.
 
 ## Available skills
 
-**Working (alpha)** = every tool implemented, every constant verified against the live primary source (date in each skill's `last_rule_check`). **Scaffold** = honest stubs: stable tool signatures that return structured not-implemented responses, no invented regulatory figures. Last updated: 27 July 2026.
+**Working (alpha)** = every tool implemented, every constant verified against the live primary source (date in each skill's `last_rule_check`). **Scaffold** = honest stubs: stable tool signatures that return structured not-implemented responses, no invented regulatory figures. Last updated: 30 July 2026.
 
 | Skill | Jurisdiction | Status | Tests | Maintainer |
 |---|---|---|---|---|
@@ -52,6 +58,9 @@ See [`docs/integration.md`](docs/integration.md) for connecting to Claude Deskto
 | `calculate-turnover-tax-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 31 | @aquariusfoundation |
 | `check-vat-registration-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 19 | @aquariusfoundation |
 | `calculate-paye-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 21 | @aquariusfoundation |
+| `calculate-sdl-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 15 | @aquariusfoundation |
+| `calculate-carbon-tax-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 15 | @aquariusfoundation |
+| `calculate-provisional-tax-south-africa` | 🇿🇦 South Africa (SARS) | **Working (alpha)** | 24 | @aquariusfoundation |
 | `register-company-south-africa` | 🇿🇦 South Africa (CIPC) | Scaffold | 13 | @aquariusfoundation |
 | `reserve-company-name-south-africa` | 🇿🇦 South Africa (CIPC) | Scaffold | 4 | @aquariusfoundation |
 | `file-annual-return-south-africa` | 🇿🇦 South Africa (CIPC) | Scaffold | 4 | @aquariusfoundation |
@@ -59,7 +68,6 @@ See [`docs/integration.md`](docs/integration.md) for connecting to Claude Deskto
 | `apply-tax-clearance-south-africa` | 🇿🇦 South Africa (SARS) | Scaffold | 4 | @aquariusfoundation |
 | `generate-bbbee-affidavit-south-africa` | 🇿🇦 South Africa (the dtic) | Scaffold | 4 | @aquariusfoundation |
 | `check-grant-eligibility-seda-sefa` | 🇿🇦 South Africa (SEDA/SEFA) | Scaffold | 4 | @aquariusfoundation |
-| `calculate-carbon-tax-south-africa` | 🇿🇦 South Africa (SARS) | Scaffold | 4 | @aquariusfoundation |
 | `register-company-kenya` | 🇰🇪 Kenya (BRS) | Scaffold | 4 | @aquariusfoundation |
 | `register-company-nigeria` | 🇳🇬 Nigeria (CAC) | Scaffold | 4 | @aquariusfoundation |
 | `lookup-afcfta-tariff-preference` | Pan-African (AfCFTA) | Scaffold | 4 | @aquariusfoundation |
@@ -69,7 +77,7 @@ See [`docs/integration.md`](docs/integration.md) for connecting to Claude Deskto
 | `integrate-mpesa` | 🇰🇪 Kenya | Planned | — | — |
 | `register-company-rwanda` | 🇷🇼 Rwanda (RDB) | Planned | — | — |
 
-145 tests passing across the library. (The previously listed `claim-section-12j` was removed: the Section 12J VCC regime sunset on 30 June 2021 and is not coming back.)
+**200 tests passing** across the library (195 skill tests + 5 gateway contract tests). The hosted [gateway](deploy/gateway/README.md) serves the seven live skills — 27 tools — from one MCP URL; scaffolds are never mounted on the hosted surface.
 
 Want to contribute a skill? See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
@@ -77,15 +85,17 @@ Want to contribute a skill? See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ```
 mia-skills/
-├── skills/                        # one directory per skill
-│   ├── register-company-south-africa/
+├── skills/                        # one directory per skill (standalone MCP server)
+│   ├── calculate-turnover-tax-south-africa/
 │   │   ├── server.py              # FastMCP server entry point
 │   │   ├── skill.json             # schema, metadata, version
 │   │   ├── README.md              # user-facing docs
 │   │   └── tests/                 # required: pytest
 │   └── ...
+├── deploy/gateway/                # hosted MCP endpoint composing the LIVE skills
 ├── docs/                          # integration guides, architecture
-├── .github/workflows/             # CI: tests, schema validation
+├── .github/workflows/             # CI: pytest across all skills + gateway, ruff
+├── render.yaml                    # one-click Render deployment for the gateway
 ├── ARCHITECTURE.md                # technical architecture
 ├── CONTRIBUTING.md                # how to add a skill
 ├── CLAUDE.md                      # orientation for Claude Code

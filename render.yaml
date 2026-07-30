@@ -1,0 +1,10 @@
+# Render deployment for the MIA skills gateway (deploy/gateway).
+# One web service = one hosted MCP endpoint serving every LIVE skill.
+services:
+  - type: web
+    name: mia-skills-gateway
+    runtime: python
+    plan: free
+    buildCommand: pip install -r deploy/gateway/requirements.txt
+    startCommand: python deploy/gateway/server.py
+    autoDeploy: true
