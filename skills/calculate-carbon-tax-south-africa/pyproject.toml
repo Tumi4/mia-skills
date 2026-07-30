@@ -1,14 +1,14 @@
 [project]
 name = "mia-calculate-carbon-tax-south-africa"
-version = "0.1.0"
-description = "MIA skill (SCAFFOLD): Calculate South African carbon tax liability for emitting activities."
+version = "0.2.0"
+description = "MIA skill: Calculate South African carbon tax from emissions, allowances and the current rate"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [
     { name = "The Aquarius Foundation", email = "skills@theaquariusfoundation.org" }
 ]
-keywords = ["mcp", "mia", "africa", "scaffold", "za", "sars"]
+keywords = ["mcp", "mia", "africa", "za", "sars"]
 dependencies = [
     "fastmcp>=0.2.0",
     "pydantic>=2.0",

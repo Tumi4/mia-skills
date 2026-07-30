@@ -1,33 +1,32 @@
 {
   "name": "calculate-carbon-tax-south-africa",
-  "version": "0.1.0",
-  "description": "Calculate South African carbon tax liability for emitting activities. (SCAFFOLD - not yet implemented)",
-  "jurisdiction": [
-    "ZA"
-  ],
+  "version": "0.2.0",
+  "description": "Calculate South African carbon tax from emissions and the entity's allowance, check scope, and estimate the carbon fuel levy embedded in fleet fuel spend.",
+  "jurisdiction": ["ZA"],
   "category": "tax-calculation",
-  "regulators": [
-    "SARS"
-  ],
+  "regulators": ["SARS"],
   "maintainer": {
     "name": "Aquarius Foundation",
     "email": "skills@theaquariusfoundation.org",
     "github": "aquariusfoundation"
   },
-  "status": "scaffold",
+  "status": "alpha",
   "requires_credentials": [],
   "requires_human_steps": [
-    "Carbon tax registration and accounts run via SARS excise; emissions data needs a competent person"
+    "License emissions facilities with SARS (administered through customs and excise)",
+    "Confirm the entity's tax-free allowance determination (basic, trade exposure, performance, carbon budget, offsets) with a registered tax practitioner",
+    "Source emissions tonnage from formal GHG reporting by a competent person"
   ],
-  "estimated_completion_time": "requires research",
-  "estimated_cost_zar": null,
+  "estimated_completion_time": "Instant (calculation only)",
+  "estimated_cost_zar": 0,
   "tools_exposed": [
-    "check_liability",
     "calculate_carbon_tax",
+    "check_liability",
+    "estimate_carbon_fuel_levy",
     "get_status"
   ],
-  "rule_basis": "None encoded yet - scaffold. Research needed: The current carbon tax rate per tonne CO2e (it escalates annually), phase rules and allowance percentages require research against live SARS pages before any constant is coded.",
-  "last_rule_check": null,
+  "rule_basis": "Carbon Tax Act (2019): R308/t CO2e from 1 Jan 2026, R236/t for 2025 (National Treasury Budget 2026 Review); allowances 60%-95% per SARS (entity-specific, taken as input); carbon fuel levy 19c/l petrol, 23c/l diesel from 1 Apr 2026",
+  "last_rule_check": "2026-07",
   "license": "Apache-2.0",
   "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/calculate-carbon-tax-south-africa",
   "support_email": "skills@theaquariusfoundation.org"
