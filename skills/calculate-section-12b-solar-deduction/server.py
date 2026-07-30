@@ -15,6 +15,8 @@ IMPORTANT context (current as of 2026):
 - This skill calculates the live Section 12B benefit, and can also show what the lapsed
   12BA benefit *would* have been, for educational comparison, clearly flagged as expired.
 
+Personal income tax figures are the 2027 year of assessment (1 March 2026 - 28 February 2027).
+
 This is a tool, not tax advice. Always have a registered tax practitioner confirm any claim.
 
 Usage:
@@ -37,7 +39,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message
 
 mcp = FastMCP("mia-calculate-section-12b-solar-deduction")
 
-# ─── Constants (SARS rules, current 2026) ───────────────────────────────────────
+# ─── Constants (SARS rules, current 2027 year of assessment) ────────────────────
 
 # Section 12B: 100% year-one deduction for qualifying PV solar (no cap for PV).
 SECTION_12B_RATE = 1.00
@@ -54,16 +56,18 @@ CORPORATE_TAX_RATE = 0.27
 # from 1 March 2023 onwards). Special trusts are taxed on the individual brackets.
 TRUST_FLAT_RATE = 0.45
 
-# 2026 SARS personal income tax brackets (year of assessment ending Feb 2026).
+# 2027 SARS personal income tax brackets (year of assessment 1 March 2026 - 28 February 2027).
+# Source: https://www.sars.gov.za/tax-rates/income-tax/rates-of-tax-for-individuals/
+# Checked against the live SARS table on 2026-07-30.
 # (lower_bound_inclusive, upper_bound_inclusive_or_None, base_tax, marginal_rate)
-PERSONAL_TAX_BRACKETS_2026 = [
-    (0, 237_100, 0, 0.18),
-    (237_101, 370_500, 42_678, 0.26),
-    (370_501, 512_800, 77_362, 0.31),
-    (512_801, 673_000, 121_475, 0.36),
-    (673_001, 857_900, 179_147, 0.39),
-    (857_901, 1_817_000, 251_258, 0.41),
-    (1_817_001, None, 644_489, 0.45),
+PERSONAL_TAX_BRACKETS_2027 = [
+    (0, 245_100, 0, 0.18),
+    (245_101, 383_100, 44_118, 0.26),
+    (383_101, 530_200, 79_998, 0.31),
+    (530_201, 695_800, 125_599, 0.36),
+    (695_801, 887_000, 185_215, 0.39),
+    (887_001, 1_878_600, 259_783, 0.41),
+    (1_878_601, None, 666_339, 0.45),
 ]
 
 
@@ -136,22 +140,22 @@ class DeductionOutput(BaseModel):
 
 
 def _marginal_rate_for_individual(taxable_income: float) -> float:
-    """Return the marginal tax rate for an individual at a given taxable income (2026)."""
-    for _lower, upper, _base, rate in PERSONAL_TAX_BRACKETS_2026:
+    """Return the marginal tax rate for an individual at a given taxable income (2027)."""
+    for _lower, upper, _base, rate in PERSONAL_TAX_BRACKETS_2027:
         if upper is None or taxable_income <= upper:
             return rate
-    return PERSONAL_TAX_BRACKETS_2026[-1][3]
+    return PERSONAL_TAX_BRACKETS_2027[-1][3]
 
 
 def _personal_tax(taxable_income: float) -> float:
-    """Compute total personal income tax for a given taxable income (2026 brackets).
+    """Compute total personal income tax for a given taxable income (2027 brackets).
 
-    NOTE: this deliberately excludes the primary rebate (R17,235 for 2026). It is only
+    NOTE: this deliberately excludes the primary rebate (R17,820 for 2027). It is only
     ever used as a *difference* (tax_before - tax_after), where the constant rebate
     cancels, so the cash-saving figure stays correct. Do not "fix" by adding the rebate
     unless you also change every call site to use absolute tax payable.
     """
-    for lower, upper, base, rate in PERSONAL_TAX_BRACKETS_2026:
+    for lower, upper, base, rate in PERSONAL_TAX_BRACKETS_2027:
         if upper is None or taxable_income <= upper:
             return base + (taxable_income - (lower - 1 if lower > 0 else 0)) * rate
     return 0.0
@@ -384,10 +388,10 @@ async def get_status() -> dict:
             "get_status",
         ],
         "tools_stubbed": [],
-        "tax_year_brackets": "2026 (year of assessment ending Feb 2026)",
+        "tax_year_brackets": "2027 (1 March 2026 - 28 February 2027)",
         "corporate_rate": CORPORATE_TAX_RATE,
         "disclaimer": "Calculation tool, not tax advice. Confirm with a registered tax practitioner.",
-        "last_rule_check": "2026-06",
+        "last_rule_check": "2026-07",
     }
 
 

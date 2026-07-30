@@ -87,7 +87,7 @@ The cash tax saving is computed at the correct rate for the taxpayer:
 | `taxpayer_type` | Rate basis |
 |---|---|
 | `company` | Flat 27% |
-| `individual` | Progressive 2026 individual brackets (relief at the marginal rate) |
+| `individual` | Progressive 2027 individual brackets (relief at the marginal rate) |
 | `sole_proprietor` | Progressive individual brackets (taxed as an individual) |
 | `trust` | **Flat 45%** — ordinary (non-special) trusts |
 | `special_trust` | Progressive individual brackets (e.g. disability / testamentary minor trusts) |
@@ -117,10 +117,10 @@ Other limits:
 ## Rule basis and maintenance
 
 - Income Tax Act s12B (live), s12BA (expired 28 Feb 2025)
-- Personal tax brackets: 2026 year of assessment
+- Personal tax brackets: 2027 year of assessment (1 March 2026 – 28 February 2027), per the [SARS rates of tax for individuals](https://www.sars.gov.za/tax-rates/income-tax/rates-of-tax-for-individuals/)
 - Corporate rate: 27%
 - Ordinary trust rate: 45% (special trusts taxed on the individual brackets)
-- Last rule check: June 2026
+- Last rule check: July 2026
 
 If SARS changes rates or brackets, update the constants at the top of `server.py` and bump the version. The tests pin the reference numbers so drift is caught.
 

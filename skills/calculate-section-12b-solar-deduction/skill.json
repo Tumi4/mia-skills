@@ -27,7 +27,7 @@
     "get_status"
   ],
   "rule_basis": "Income Tax Act s12B (live, permanent); s12BA (expired 28 Feb 2025)",
-  "last_rule_check": "2026-06",
+  "last_rule_check": "2026-07",
   "license": "Apache-2.0",
   "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/calculate-section-12b-solar-deduction",
   "support_email": "skills@theaquariusfoundation.org"

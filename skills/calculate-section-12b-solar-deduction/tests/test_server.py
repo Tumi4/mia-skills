@@ -93,9 +93,12 @@ class TestCalculateDeduction:
                 taxable_income_zar=2_000_000,  # top bracket, 45%
             )
         )
-        # Top earner gets relief at 45% on the margin
+        # Top earner gets relief at 45% on the margin.
         assert out.marginal_rate_used == 0.45
-        assert out.cash_tax_saving_zar == pytest.approx(200_000 * 0.45, rel=0.01)
+        # The deduction straddles the 2027 top-bracket floor (R1,878,601): the first
+        # R121,400 of relief lands at 45%, the remaining R78,600 at 41%.
+        # tax(2,000,000) = 720,969; tax(1,800,000) = 634,113 → saving = 86,856.
+        assert out.cash_tax_saving_zar == pytest.approx(86_856.0)
 
     async def test_requires_human_always_true(self):
         out = await calculate_deduction(

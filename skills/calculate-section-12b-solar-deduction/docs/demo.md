@@ -92,11 +92,11 @@ pretending to be your tax practitioner."*
 |---|---|
 | Marginal rate used | **41%** |
 | Deduction | R120,000 |
-| Cash tax saving | **R47,642** |
-| Effective net cost | **R72,358** |
+| Cash tax saving | **R47,060** |
+| Effective net cost | **R72,940** |
 
 **Talking point:** *"Same skill, completely different tax logic. For an individual it
-runs the **2026 SARS progressive brackets** and gives relief at the **marginal rate** —
+runs the **2027 SARS progressive brackets** and gives relief at the **marginal rate** —
 here 41%. A company gets a flat 27%; an ordinary trust gets a flat 45%; a special trust
 goes back on the individual table. That distinction is the kind of thing founders get
 wrong and consultants charge for. It's baked in."*
