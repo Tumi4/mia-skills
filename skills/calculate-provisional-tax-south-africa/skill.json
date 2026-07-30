@@ -1,0 +1,34 @@
+{
+  "name": "calculate-provisional-tax-south-africa",
+  "version": "0.1.0",
+  "description": "Calculate South African provisional tax (IRP6) payments, check provisional-taxpayer status, compute the basic amount, and quantify 20% underestimation penalty exposure.",
+  "jurisdiction": ["ZA"],
+  "category": "tax-calculation",
+  "regulators": ["SARS"],
+  "maintainer": {
+    "name": "Aquarius Foundation",
+    "email": "skills@theaquariusfoundation.org",
+    "github": "aquariusfoundation"
+  },
+  "status": "alpha",
+  "requires_credentials": [],
+  "requires_human_steps": [
+    "Submit IRP6 returns on eFiling and pay by the period deadlines (10% penalty on late payment)",
+    "Confirm second-period estimates against the 90%/80% accuracy rules with a registered tax practitioner",
+    "Penalty remission requests for seriously-calculated estimates are practitioner territory"
+  ],
+  "estimated_completion_time": "Instant (calculation only)",
+  "estimated_cost_zar": 0,
+  "tools_exposed": [
+    "check_provisional_taxpayer_status",
+    "calculate_provisional_payment",
+    "check_underestimation_penalty",
+    "calculate_basic_amount",
+    "get_status"
+  ],
+  "rule_basis": "SARS Guide for Provisional Tax GEN-PT-01-G01 (effective 29 Jun 2026): period formulas, 90%/80%/R1m accuracy rules, 20% underestimation penalty, basic amount + 8% escalation, 10% late-payment penalty; SARS provisional tax page (29 Jun 2026): status exclusions; 2027 individual table, 27% corporate, 45% trust",
+  "last_rule_check": "2026-07",
+  "license": "Apache-2.0",
+  "documentation_url": "https://github.com/aquariusfoundation/mia-skills/tree/main/skills/calculate-provisional-tax-south-africa",
+  "support_email": "skills@theaquariusfoundation.org"
+}
