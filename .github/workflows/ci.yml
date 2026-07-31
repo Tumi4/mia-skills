@@ -16,7 +16,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install "fastmcp>=3,<4" "pydantic>=2" email-validator pytest pytest-asyncio ruff
+        run: |
+          pip install "fastmcp>=3,<4" "pydantic>=2" email-validator pytest pytest-asyncio ruff
+          pip install "anthropic>=0.69" "fastapi>=0.115" "uvicorn>=0.30" httpx
 
       - name: Test every skill
         run: |
@@ -29,6 +31,12 @@ jobs:
       - name: Test the gateway
         run: |
           cd deploy/gateway
+          python -m pytest tests -q
+
+      - name: Test the agent
+        # No ANTHROPIC_API_KEY here on purpose - no agent test may call the real API.
+        run: |
+          cd deploy/agent
           python -m pytest tests -q
 
       - name: Lint (ruff)

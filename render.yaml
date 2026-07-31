@@ -1,5 +1,10 @@
-# Render deployment for the MIA skills gateway (deploy/gateway).
-# One web service = one hosted MCP endpoint serving every LIVE skill.
+# Render deployment for the MIA deployment artifacts.
+#
+#   mia-skills-gateway (deploy/gateway) - one hosted MCP endpoint serving every LIVE skill.
+#   mia-agent          (deploy/agent)   - the channel-agnostic agent + browser chat page.
+#
+# Two separate web services from one repo. The agent drives the gateway IN-PROCESS,
+# so it does not call the gateway service over HTTP and works even if that one is asleep.
 services:
   - type: web
     name: mia-skills-gateway
@@ -8,3 +13,30 @@ services:
     buildCommand: pip install -r deploy/gateway/requirements.txt
     startCommand: python deploy/gateway/server.py
     autoDeploy: true
+
+  - type: web
+    name: mia-agent
+    runtime: python
+    # Free tier sleeps after ~15 min idle (30-60s cold start). Fine while testing;
+    # move to `starter` (~$7/month, no sleep) before pointing real founders at it.
+    plan: free
+    buildCommand: pip install -r deploy/agent/requirements.txt
+    startCommand: python deploy/agent/server.py
+    autoDeploy: true
+    healthCheckPath: /healthz
+    envVars:
+      # sync: false = Render prompts for it in the dashboard and never stores it in the repo.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: MIA_MODEL
+        value: claude-opus-5
+      - key: MIA_MAX_OUTPUT_TOKENS
+        value: "4096"
+      - key: MIA_MAX_TOOL_ITERATIONS
+        value: "6"
+      - key: MIA_MAX_TURNS
+        value: "20"
+      - key: MIA_RATE_LIMIT_REQUESTS
+        value: "10"
+      - key: MIA_RATE_LIMIT_WINDOW_SECONDS
+        value: "60"
