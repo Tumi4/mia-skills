@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIA — from one skill to a valuation</title>
+<style>
+  :root{
+    --navy:#0B1E3B; --navy2:#13294B; --teal:#1FB8A6; --teal-d:#0C6A5F;
+    --gold:#E4B34A; --gold-ink:#6F5310; --paper:#F4F1EA; --paper2:#FBFAF7;
+    --stale:#B4443A; --stale-ink:#A03A31;
+    --ink:#0B1E3B; --ink2:#33445C; --muted:#566378; --line:#dde3ec; --hair:#e8eaf0;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",Times,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink2);line-height:1.6;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  @media(min-width:760px){.wrap{padding:0 34px}}
+  a{color:var(--teal-d)}
+  :focus-visible{outline:2.5px solid var(--teal-d);outline-offset:3px}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums lining-nums}
+
+  header{background:var(--navy);color:#EDF1F7;padding:38px 0 34px}
+  .kick{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.17em;
+    text-transform:uppercase;color:var(--teal);margin-bottom:13px}
+  header h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,5.4vw,44px);
+    line-height:1.08;letter-spacing:-.02em;color:#fff}
+  header p{color:#a8bcd6;margin-top:14px;font-size:15.5px;max-width:60ch}
+  header b{color:var(--gold);font-weight:400}
+
+  section{padding:44px 0;border-bottom:1px solid var(--line)}
+  @media(min-width:760px){section{padding:60px 0}}
+  h2{font-family:var(--serif);font-weight:400;font-size:clamp(23px,3.6vw,31px);
+    line-height:1.15;letter-spacing:-.015em;color:var(--navy);margin-bottom:8px}
+  h3{font-size:15px;font-weight:700;color:var(--navy);margin:26px 0 9px}
+  .step{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--teal-d);margin-bottom:11px}
+  p{margin-bottom:13px;max-width:66ch}
+  .lead{font-size:16.5px;color:var(--ink2);max-width:62ch}
+  .fine{font-size:12.5px;color:var(--muted);line-height:1.5}
+  .fine a{color:var(--teal-d)}
+
+  /* ledger */
+  .ledger{background:#fff;border:1px solid var(--line);margin:22px 0}
+  .lrow{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+    padding:12px 17px;border-bottom:1px solid var(--hair)}
+  .lrow:last-child{border-bottom:none}
+  .lrow .lbl{font-size:14px;flex:1}
+  .lrow .val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15.5px;
+    font-weight:700;color:var(--ink);white-space:nowrap}
+  .lrow.tot{background:var(--navy);color:#EDF1F7;border:none}
+  .lrow.tot .lbl{font-weight:700;color:#fff}
+  .lrow.tot .val{color:var(--gold);font-size:19px}
+  .lrow .sub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+  .lrow.tot .sub{color:#93AAC8}
+
+  /* stat strip */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);margin:22px 0}
+  .stat{background:#fff;padding:15px 16px}
+  .stat b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;
+    font-size:clamp(21px,3.6vw,27px);font-weight:700;color:var(--navy);letter-spacing:-.02em;line-height:1.1}
+  .stat span{display:block;font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .stat.hot b{color:var(--stale)}
+
+  /* callout */
+  .call{background:var(--paper2);border:1px solid var(--line);border-left:4px solid var(--teal);
+    padding:16px 18px;margin:22px 0;font-size:14.5px;max-width:70ch}
+  .call.gold{border-left-color:var(--gold);background:#fffdf7}
+  .call.red{border-left-color:var(--stale);background:#fdf6f5}
+  .call b{color:var(--navy)}
+
+  /* dials */
+  .dials{background:#fff;border:1px solid var(--line);padding:18px;margin:22px 0}
+  .dial{margin-bottom:19px}
+  .dial:last-child{margin-bottom:0}
+  .dial label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    font-size:13.5px;font-weight:600;color:var(--navy);margin-bottom:9px}
+  .dial label .out{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;
+    color:var(--teal-d);font-size:14.5px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;display:block;
+    background:linear-gradient(90deg,var(--teal) 0%,var(--teal) var(--p,30%),#d5dbe5 var(--p,30%));cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;
+    border-radius:50%;background:#fff;border:3px solid var(--teal-d);box-shadow:0 1px 4px rgba(11,30,59,.26)}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;
+    border:3px solid var(--teal-d);box-shadow:0 1px 4px rgba(11,30,59,.26)}
+  .dial .hint{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+
+  .result{background:var(--navy);color:#EDF1F7;padding:20px;margin:22px 0}
+  .rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px}
+  .rcell b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;
+    font-size:clamp(20px,3.6vw,26px);font-weight:700;color:#fff;letter-spacing:-.02em;line-height:1.1}
+  .rcell b.gold{color:var(--gold)}
+  .rcell span{display:block;font-size:11.5px;color:#93AAC8;margin-top:6px;
+    font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+  .verdict{margin-top:18px;padding-top:16px;border-top:1px solid #22405F;
+    font-family:var(--serif);font-size:16.5px;line-height:1.45;color:#EDF1F7}
+  .verdict b{color:var(--gold);font-weight:400;font-style:italic}
+
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13.5px;background:#fff;
+    border:1px solid var(--line)}
+  th{text-align:left;padding:10px 13px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);
+    font-weight:700;background:var(--paper2)}
+  td{padding:10px 13px;border-bottom:1px solid var(--hair);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.hi td{background:#f0faf8;font-weight:700;color:var(--navy)}
+
+  @media(max-width:620px){
+    table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    td.n{white-space:normal}
+    .lrow{flex-wrap:wrap}
+    .lrow .val{width:100%;text-align:left}
+  }
+  .srcs{font-size:12px;color:var(--muted);line-height:1.65}
+  .srcs li{margin-bottom:7px;list-style:none;padding-left:15px;text-indent:-15px}
+  .srcs a{word-break:break-word}
+  footer{padding:34px 0 50px;font-size:12.5px;color:var(--muted)}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <p class="kick">MIA · Made in Africa</p>
+  <h1>From one skill to a valuation</h1>
+  <p>A bottom-up model built from published SARS, National Treasury and market figures. Every number
+    below is either <b>sourced and dated</b> or <b>a dial you can move</b>. Nothing is asserted.</p>
+</div></header>
+
+<!-- ══ 1 ══ -->
+<section><div class="wrap">
+  <p class="step">01 · The unit</p>
+  <h2>What one correct answer is worth</h2>
+  <p class="lead">Take a single skill — the VAT registration check — and a single moment: a South African
+    business crosses R2 300 000 of taxable supplies and has 21 business days to register.</p>
+
+  <p>Miss it and there is no fixed fine. SARS backdates the registration to the date the threshold was
+    breached, and the business then owes output VAT on <i>everything it has sold since</i> — at 15/115 of
+    gross supplies — whether or not it ever charged VAT to a customer. It cannot go back and collect it.</p>
+
+  <h3>Worked example: R3 000 000 of supplies, registered twelve months late</h3>
+  <div class="ledger">
+    <div class="lrow"><span class="lbl">Backdated output VAT<span class="sub">R3 000 000 × 15/115 — unrecoverable from customers</span></span><span class="val">R391 304</span></div>
+    <div class="lrow"><span class="lbl">Late payment penalty<span class="sub">10% of outstanding tax (SARS VAT 404, Issue 15)</span></span><span class="val">R39 130</span></div>
+    <div class="lrow"><span class="lbl">Interest, 12 months<span class="sub">10.25% prescribed rate, effective 1 March 2026</span></span><span class="val">R40 109</span></div>
+    <div class="lrow tot"><span class="lbl">Exposure from one missed threshold<span class="sub">before any understatement penalty</span></span><span class="val">R470 543</span></div>
+  </div>
+
+  <div class="call red">
+    <b>And since 1 April 2026 it is worse.</b> The Tax Administration Laws Amendment Act removed the
+    bar on SARS raising an understatement penalty where the error was a <i>bona fide inadvertent
+    mistake</i>. Honest ignorance stopped being a complete defence four months ago. Standard-case
+    understatement penalties run from 10% to 150% of the shortfall.
+  </div>
+
+  <div class="call">
+    <b>The asymmetry is the product.</b> MIA answers this question in about 40 milliseconds, for nothing,
+    from constants read off SARS with the date attached. Govchain charges R2 970 to do the registration.
+    A tax practitioner charges R900–R2 000 an hour. The cost of the answer is zero; the cost of the wrong
+    answer is six figures.
+  </div>
+</div></section>
+
+<!-- ══ 2 ══ -->
+<section><div class="wrap">
+  <p class="step">02 · The population</p>
+  <h2>How often that moment happens</h2>
+  <p class="lead">These are SARS's and CIPC's own published figures, not estimates.</p>
+
+  <div class="stats">
+    <div class="stat"><b>900 285</b><span>Registered VAT vendors, 31 Mar 2025</span></div>
+    <div class="stat"><b>496 858</b><span>Of which active — 55.2%</span></div>
+    <div class="stat"><b>488 355</b><span>New companies registered, CIPC FY2024/25</span></div>
+    <div class="stat"><b>648 500</b><span>Registered PAYE employers</span></div>
+  </div>
+
+  <p>Every new company eventually meets this threshold question. Every active vendor meets it again each
+    year. And 403 427 vendors sit registered but not transacting — a live deregistration decision that
+    nothing on the market handles.</p>
+
+  <h3>The number that sizes the problem</h3>
+  <div class="stats">
+    <div class="stat hot"><b>339 635</b><span>VAT cases SARS verified or audited in 2024/25</span></div>
+    <div class="stat hot"><b>56.1%</b><span>Of those found accurate</span></div>
+    <div class="stat hot"><b>149 028</b><span>Were not — SARS's own annual report</span></div>
+  </div>
+
+  <div class="call gold">
+    <b>Nearly half the VAT cases SARS checked were wrong.</b> That is not our claim about the market. It
+    is SARS reporting on itself, in a report tabled in Parliament. It is the error rate this library
+    exists to attack, and it is the strongest single figure in this document.
+  </div>
+</div></section>
+
+<!-- ══ 3 ══ -->
+<section><div class="wrap">
+  <p class="step">03 · Why it is infrastructure, not a service</p>
+  <h2>Zero marginal cost is the whole argument</h2>
+
+  <table>
+    <thead><tr><th>Answering the same question</th><th>Cost of the first answer</th><th>Cost of the hundred-thousandth</th></tr></thead>
+    <tbody>
+      <tr><td>Tax practitioner, per hour</td><td class="n">R900 – R2 000</td><td class="n">R900 – R2 000</td></tr>
+      <tr><td>Compliance provider, VAT registration</td><td class="n">R2 970</td><td class="n">R2 970</td></tr>
+      <tr><td>Monthly VAT201 retainer</td><td class="n">R2 000 / mo</td><td class="n">R2 000 / mo</td></tr>
+      <tr class="hi"><td>MIA skill, per call</td><td class="n">≈ R0</td><td class="n">≈ R0</td></tr>
+    </tbody>
+  </table>
+
+  <p>A skill is a stateless function over small numbers. It holds no state, queues nothing and calls no
+    model — the calculation endpoint makes no AI request at all. The hundred-thousandth answer costs
+    what the first one did, which is essentially nothing.</p>
+
+  <p>That is the difference between a services business and infrastructure, and the market prices it
+    accordingly. As at July 2026, developer infrastructure trades at a multiple of ordinary software:</p>
+
+  <table>
+    <thead><tr><th>Segment</th><th>EV / revenue (NTM)</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>DevOps — infrastructure developers call</td><td class="n">7.4×</td></tr>
+      <tr><td>Data infrastructure</td><td class="n">4.9×</td></tr>
+      <tr><td>Infrastructure SaaS, median</td><td class="n">2.8×</td></tr>
+      <tr><td>Vertical SaaS, median</td><td class="n">2.3×</td></tr>
+      <tr><td>Horizontal SaaS, median</td><td class="n">2.1×</td></tr>
+    </tbody>
+  </table>
+  <p class="fine">Software universe median 3.7× EV/NTM revenue; the high-growth cohort (&gt;22% NTM growth)
+    trades at 19.8×. Both used in the model below.</p>
+</div></section>
+
+<!-- ══ 4 ══ -->
+<section><div class="wrap">
+  <p class="step">04 · The model</p>
+  <h2>Move the dials</h2>
+  <p class="lead">Every input below is an assumption, and every one is falsifiable. The point is not to
+    land on a number — it is to see which assumption the whole case rests on.</p>
+
+  <div class="dials">
+    <div class="dial">
+      <label for="d-pen">Share of active VAT vendors reached <span class="out" id="o-pen">2.0%</span></label>
+      <input type="range" id="d-pen" min="1" max="300" step="1" value="20">
+      <p class="hint">Reached directly or through their accountant. 496 858 active vendors is the denominator.</p>
+    </div>
+    <div class="dial">
+      <label for="d-arpu">Price per business, per year <span class="out" id="o-arpu">R1 200</span></label>
+      <input type="range" id="d-arpu" min="0" max="6000" step="100" value="1200">
+      <p class="hint">For context: one hour of a tax practitioner is R900–R2 000, and a monthly VAT201 retainer is R24 000 a year.</p>
+    </div>
+    <div class="dial">
+      <label for="d-ent">Institutional customers <span class="out" id="o-ent">0</span></label>
+      <input type="range" id="d-ent" min="0" max="200" step="1" value="0">
+      <p class="hint">DFIs, banks, accounting networks, sovereigns. The Strategic Memo's enterprise tier.</p>
+    </div>
+    <div class="dial">
+      <label for="d-entp">Price per institution, per year <span class="out" id="o-entp">$300 000</span></label>
+      <input type="range" id="d-entp" min="50" max="1000" step="25" value="300">
+      <p class="hint">Strategic Memo range: $50k–$100k a month enterprise, $250k–$1m a year sovereign.</p>
+    </div>
+    <div class="dial">
+      <label for="d-mult">Revenue multiple <span class="out" id="o-mult">7.4×</span></label>
+      <input type="range" id="d-mult" min="20" max="250" step="1" value="74">
+      <p class="hint">2.1× horizontal SaaS · 3.7× software median · 7.4× DevOps · 19.8× high-growth cohort.</p>
+    </div>
+  </div>
+
+  <div class="result">
+    <div class="rgrid">
+      <div class="rcell"><b id="r-sme">R11.9m</b><span>SME layer ARR</span></div>
+      <div class="rcell"><b id="r-ent">R0</b><span>Institutional ARR</span></div>
+      <div class="rcell"><b id="r-arr">R11.9m</b><span>Total ARR</span></div>
+      <div class="rcell"><b class="gold" id="r-val">$5.3m</b><span>Implied valuation</span></div>
+    </div>
+    <p class="verdict" id="r-verdict"></p>
+  </div>
+  <p class="fine">Converted at R16.82 to the dollar, the rate on 24 July 2026. ARR is annual recurring
+    revenue; valuation is ARR × the chosen multiple, which is how the cited comparables are quoted.</p>
+</div></section>
+
+<!-- ══ 5 ══ -->
+<section><div class="wrap">
+  <p class="step">05 · The honest finding</p>
+  <h2>South Africa alone does not get there</h2>
+
+  <p class="lead">Run the numbers and the conclusion is uncomfortable, which is why it is worth stating
+    plainly rather than hiding behind a hockey stick.</p>
+
+  <p>A $1B valuation at the high-growth multiple of 19.8× needs roughly <b>$51m</b> of revenue — about
+    R858m. At R1 200 per business per year that would take 715 000 paying businesses, which is more than
+    every active VAT vendor in South Africa. <b>The SME layer in one country cannot produce a unicorn at
+    that price point.</b> Push the price to R6 000 a year and it needs 149 000 paying businesses — 30% of
+    every active vendor in the country, at five times the price. Possible on a spreadsheet; nobody has
+    ever done it.</p>
+
+  <p>What can get there is one of three things, and an investor is entitled to know which one you are
+    claiming:</p>
+
+  <table>
+    <thead><tr><th>Path</th><th>What it requires</th><th>Reaches $51m ARR at</th></tr></thead>
+    <tbody>
+      <tr><td><b>Institutional</b></td><td>DFIs, banks, accounting networks, sovereigns paying for verified, credentialed, SLA-backed access</td><td class="n">~170 customers<br>at $300k/yr</td></tr>
+      <tr><td><b>Continental</b></td><td>The SME layer across many jurisdictions, not one</td><td class="n">715 000 businesses<br>at R1 200/yr</td></tr>
+      <tr class="hi"><td><b>Blend</b></td><td>The open SME layer generates the data and the distribution that makes the institutional tier sellable</td><td class="n">~85 institutions<br>+ 350 000 businesses</td></tr>
+    </tbody>
+  </table>
+
+  <div class="call gold">
+    <b>The blend is the Strategic Memo's flywheel, with arithmetic under it.</b> The free, open layer is
+    not charity and it is not marketing — it is the input that makes the highest-margin line saleable.
+    Institutions do not buy a calculator. They buy coverage, provenance and the outcome data that only
+    exists because the free layer is being used.
+  </div>
+
+  <p><b>The one assumption everything rests on</b> is that an institution will pay six figures a year for
+    verified, credentialed, continuously-checked regulatory computation. Nothing else in this model is
+    load-bearing in the same way. It is also the cheapest assumption to test — one conversation with one
+    DFI, and it costs nothing but an introduction.</p>
+</div></section>
+
+<!-- ══ 6 ══ -->
+<section><div class="wrap">
+  <p class="step">06 · What funding buys</p>
+  <h2>The unit of deployment is a verified skill</h2>
+
+  <p class="lead">With the infrastructure built, a new skill costs roughly ten to fourteen hours of senior
+    work — R9 000 to R12 000, fully verified against primary sources, tested and documented. That is the
+    unit an investor can reason about.</p>
+
+  <table>
+    <thead><tr><th>Deployed</th><th>Buys</th><th>Which means</th></tr></thead>
+    <tbody>
+      <tr><td class="n">R120 000</td><td class="n">10–12 skills</td><td>Finish the ten in build. Seventeen live — South Africa's core compliance stack complete.</td></tr>
+      <tr class="hi"><td class="n">R350 000</td><td class="n">30–35 skills</td><td>South Africa deep, plus Kenya and Nigeria to working depth. Three jurisdictions.</td></tr>
+      <tr><td class="n">R1 000 000</td><td class="n">80–100 skills</td><td>Three jurisdictions complete and the AfCFTA trade lanes between them.</td></tr>
+    </tbody>
+  </table>
+
+  <p>For scale: the average South African venture round in 2023 was R9.54m, and 74.9% of active deals were
+    under R10m. R350 000 is not a venture round. It is roughly six weeks of one senior engineer, and it
+    triples the jurisdictional coverage of the library.</p>
+
+  <div class="call">
+    <b>Which is the honest point about the raise.</b> Skills at R10 000 each are not what a seven-figure
+    round is for. The round is for the practitioner verification network, the engine layers, distribution
+    and the outcomes data. The library is the evidence that the team executes — which is what makes
+    funding the rest a reasonable risk rather than a bet on a memo.
+  </div>
+</div></section>
+
+<!-- ══ sources ══ -->
+<section><div class="wrap">
+  <p class="step">Sources</p>
+  <h2>Every figure, traceable</h2>
+  <ul class="srcs">
+    <li>— VAT registration thresholds (R2.3m compulsory, R120 000 voluntary, effective 1 April 2026): <a href="https://www.sars.gov.za/faq/what-is-the-new-threshold-for-vat-registration/">SARS FAQ</a>, updated 16 April 2026.</li>
+    <li>— Backdated registration and the 15/115 tax fraction: VAT Act 89 of 1991, ss 23(1)(a), 23(4); <a href="https://www.accountingweekly.com/tax/actions-and-consequences-of-late-vat-registration">Accounting Weekly</a>.</li>
+    <li>— 10% late payment penalty: <a href="https://www.sars.gov.za/wp-content/uploads/Ops/Guides/Legal-Pub-Guide-VAT404-VAT-404-Guide-for-Vendors.pdf">SARS VAT 404 Guide for Vendors</a>, Issue 15, 17 December 2024.</li>
+    <li>— 10.25% interest on outstanding tax, effective 1 March 2026: <a href="https://www.sars.gov.za/wp-content/uploads/Legal/Rates/Legal-Pub-IRT-01-Interest-Rates-Table-1.pdf">SARS Interest Rate Table 1</a>.</li>
+    <li>— Understatement penalty bands 10%–150%, and the 1 April 2026 removal of the bona fide inadvertent error bar: Tax Administration Act 28 of 2011 s223; Tax Administration Laws Amendment Act 4 of 2026; <a href="https://www.fanews.co.za/article/tax/16/tax/1016/south-africa-s-understatement-penalty-regime-has-changed-what-taxpayers-need-to-know/43760">FAnews</a>, 15 April 2026.</li>
+    <li>— 900 285 registered / 496 858 active VAT vendors, 648 500 PAYE employers, at 31 March 2025: <a href="https://www.sars.gov.za/2025-tax-statistics-highlight-pdf/">SARS &amp; National Treasury Tax Statistics 2025</a>, 18th edition, released 5 December 2025.</li>
+    <li>— 339 635 VAT cases verified/audited, 190 607 accurate (56.1%): <a href="https://static.pmg.org.za/SARS-AR-30-Annual-Report-2024-2025.pdf">SARS Annual Report 2024/25</a>.</li>
+    <li>— 488 355 new companies registered FY2024/25: <a href="https://www.thedtic.gov.za/wp-content/uploads/CIPC_2024-2025-ANNUAL-REPORT.pdf">CIPC Annual Report 2024/25</a>, 31 August 2025.</li>
+    <li>— Practitioner and compliance pricing: <a href="https://www.govchain.co.za/services/vat-registration">Govchain</a> (R2 970 registration, R2 000/month VAT201); <a href="https://www.procompare.co.za/prices/accountants/company-tax">Procompare 2026 price guide</a> (R900–R1 600/hr).</li>
+    <li>— Segment multiples, July 2026 dataset: <a href="https://multiples.vc/insights/software-saas-valuation-multiples">Multiples.vc</a>. Software median 3.7× and high-growth cohort 19.8×: <a href="https://cloudedjudgement.substack.com/p/clouded-judgement-71726-open-weights">Clouded Judgement</a>, 17 July 2026.</li>
+    <li>— SA venture round sizes: <a href="https://savca.co.za/wp-content/uploads/2024/07/SAVCA-VC-Survey-2024-Digital.pdf">SAVCA VC Survey 2024</a> — R9.54m average round, 74.9% of deals under R10m.</li>
+    <li>— USD/ZAR 16.82 on 24 July 2026: <a href="https://tradingeconomics.com/south-africa/currency">Trading Economics</a>.</li>
+  </ul>
+
+  <div class="call" style="margin-top:26px">
+    <b>Deliberately not used.</b> No SMME population figure — the Small Business Institute's study puts
+    formal employing SMMEs near 250 000 and contradicts the larger numbers in circulation. No cost-of-a-SARS-audit
+    figure — none is published. No "$100m ARR equals $1B" rule — it does not survive today's multiples.
+    Each of those would have made this document look better and none of them would have survived a
+    diligence question.
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  MIA — Made in Africa · model prepared 2 August 2026 · figures current as at their cited dates.<br>
+  This is a model with stated assumptions, not a forecast. Move the dials and it changes.
+</div></footer>
+
+<script>
+  var VENDORS = 496858;      // active VAT vendors, SARS Tax Stats 2025
+  var FX = 16.82;            // USD/ZAR, 24 July 2026
+  var UNICORN_USD = 1e9;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var dials = ["pen", "arpu", "ent", "entp", "mult"];
+
+  function zar(n) {
+    if (n >= 1e9) return "R" + (n / 1e9).toFixed(2) + "bn";
+    if (n >= 1e6) return "R" + (n / 1e6).toFixed(1) + "m";
+    if (n >= 1e3) return "R" + Math.round(n / 1e3) + "k";
+    return "R" + Math.round(n);
+  }
+  function usd(n) {
+    if (n >= 1e9) return "$" + (n / 1e9).toFixed(2) + "bn";
+    if (n >= 1e6) return "$" + (n / 1e6).toFixed(1) + "m";
+    if (n >= 1e3) return "$" + Math.round(n / 1e3) + "k";
+    return "$" + Math.round(n);
+  }
+  function grouped(n) {
+    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  }
+
+  function render() {
+    var pen = +$("d-pen").value / 10;          // 0.1% .. 30%
+    var arpu = +$("d-arpu").value;             // rand per business per year
+    var ent = +$("d-ent").value;               // institutional customer count
+    var entp = +$("d-entp").value * 1000;      // USD per institution per year
+    var mult = +$("d-mult").value / 10;        // revenue multiple
+
+    $("o-pen").textContent = pen.toFixed(1) + "%";
+    $("o-arpu").textContent = "R" + grouped(arpu);
+    $("o-ent").textContent = grouped(ent);
+    $("o-entp").textContent = "$" + grouped(entp);
+    $("o-mult").textContent = mult.toFixed(1) + "×";
+
+    dials.forEach(function (k) {
+      var el = $("d-" + k);
+      el.style.setProperty("--p", ((el.value - el.min) / (el.max - el.min) * 100) + "%");
+    });
+
+    var businesses = VENDORS * pen / 100;
+    var smeArr = businesses * arpu;                 // ZAR
+    var entArr = ent * entp * FX;                   // ZAR
+    var arr = smeArr + entArr;
+    var valUsd = arr * mult / FX;
+
+    $("r-sme").textContent = zar(smeArr);
+    $("r-ent").textContent = zar(entArr);
+    $("r-arr").textContent = zar(arr);
+    $("r-val").textContent = usd(valUsd);
+
+    /* The verdict is written to make the constraint visible, not to flatter the dials. */
+    var msg;
+    if (valUsd >= UNICORN_USD) {
+      var shareInst = entArr / Math.max(arr, 1);
+      msg = shareInst >= 0.5
+        ? "A billion, and <b>" + Math.round(shareInst * 100) + "% of it is institutional</b>. That is the honest shape of this — the open layer earns the right to sell the institutional tier."
+        : "A billion off the SME layer alone would need <b>" + grouped(businesses) + " paying businesses</b> — check that against 496 858 active vendors in the whole country before you say it out loud.";
+    } else if (businesses > VENDORS * 0.25) {
+      msg = "That is <b>" + grouped(businesses) + " businesses</b>, more than a quarter of every active VAT vendor in South Africa. Defensible only with a distribution story to match.";
+    } else if (ent === 0) {
+      msg = "SME layer only. <b>Move the institutional dial</b> — that is where the model actually turns, and it is the one assumption worth testing first.";
+    } else {
+      msg = "Roughly <b>" + usd(valUsd) + "</b>, on " + grouped(businesses) + " businesses and " + grouped(ent) +
+            " institutions. To reach a billion at this multiple you need " + usd(UNICORN_USD * FX / mult / FX) + " of revenue.";
+    }
+    $("r-verdict").innerHTML = msg;
+  }
+
+  dials.forEach(function (k) { $("d-" + k).addEventListener("input", render); });
+  render();
+</script>
+</body>
+</html>

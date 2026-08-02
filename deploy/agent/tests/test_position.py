@@ -180,3 +180,21 @@ def test_position_needs_no_api_key(client, monkeypatch):
     """The landing page must stay free to serve - no model call, ever."""
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     assert client.get("/api/position", params={"turnover": 500_000}).status_code == 200
+
+
+def test_model_page_is_served_and_self_contained(client):
+    """The value model must load with no external requests - it goes to funders."""
+    response = client.get("/model")
+    assert response.status_code == 200
+    body = response.text
+    assert "From one skill to a valuation" in body
+    assert "localStorage" not in body and "sessionStorage" not in body
+    for marker in ("cdn.", "https://unpkg", "https://cdnjs", "googleapis", "<script src="):
+        assert marker not in body
+
+
+def test_model_page_carries_its_sources(client):
+    """Every figure in it is meant to be traceable; the sources block must survive."""
+    body = client.get("/model").text
+    assert "sars.gov.za" in body
+    assert "Deliberately not used" in body

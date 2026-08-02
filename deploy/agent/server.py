@@ -5,6 +5,7 @@ Surfaces:
 
     GET  /             the landing page - a live turnover-tax + VAT instrument
     GET  /ask          a self-contained browser chat page (inline CSS/JS, no CDN)
+    GET  /model        the investor value model - static, self-contained
     POST /chat         {session_id, message} -> {reply, tools_called[], requires_human[]}
     GET  /api/position ?turnover= -> both columns, computed by the real skills
     GET  /healthz      uptime check
@@ -78,6 +79,7 @@ agent = MiaAgent()
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 LANDING_PAGE = STATIC_DIR / "index.html"
+VALUE_MODEL_PAGE = STATIC_DIR / "model.html"
 
 # The landing page shares the agent's gateway so both surfaces answer from the
 # same in-process skills. Reused rather than re-imported: loading the gateway
@@ -514,6 +516,24 @@ async def index():
 async def ask():
     """The browser chat page - where a founder asks in their own words."""
     return HTMLResponse(content=CHAT_PAGE)
+
+
+@app.get("/model", response_class=HTMLResponse)
+async def value_model():
+    """The investor value model - one skill, the arithmetic, the valuation.
+
+    Served from the same origin as the landing page on purpose: it is the
+    argument behind the demo, and a funder who opens one will open the other.
+    Static and self-contained; no API call, no key, nothing to spend.
+    """
+    try:
+        return HTMLResponse(content=VALUE_MODEL_PAGE.read_text(encoding="utf-8"))
+    except OSError:
+        logger.exception("value model missing at %s", VALUE_MODEL_PAGE)
+        return HTMLResponse(
+            content="<h1>Not found</h1><p>The value model is not available on this deploy.</p>",
+            status_code=404,
+        )
 
 
 if __name__ == "__main__":
