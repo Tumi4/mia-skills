@@ -454,7 +454,7 @@
     <div class="skill scaffold"><b>afcfta-tariff</b><span>Scaffold · AfCFTA</span></div>
   </div>
 
-  <p class="small" style="margin-top:18px">238 automated tests across the library, run on every change.
+  <p class="small" style="margin-top:18px">200 automated tests across the library, run on every change.
     Open source under Apache 2.0 — anyone can read the rules, check the sources, or contribute a jurisdiction.</p>
 </div></section>
 
@@ -583,8 +583,15 @@ function render(v){
   else if (d > 0)
     msg = "The old rules overcharge this business by <b>" + rand(d) + "</b> a year — " +
           Math.round(d / Math.max(taxOld,1) * 100) + "% too much.";
-  else
-    msg = "Both answers agree here. <b>They stop agreeing above R750,000</b> — move the slider.";
+  else {
+    // Derived from the generated constants, never hand-written: below R50,000 the next
+    // divergence is the old VAT voluntary minimum; between R120,000 and R335,000 it is
+    // the old turnover-tax first floor.
+    const nextSplit = [VAT_VOL_OLD, T2026[0][0]].filter(x => x >= v).sort((a, b) => a - b)[0];
+    msg = nextSplit
+      ? "Both answers agree here. <b>They stop agreeing above " + rand(nextSplit) + "</b> — move the slider."
+      : "Both answers agree here. <b>Move the slider</b> to where they don't.";
+  }
   $("deltatext").innerHTML = msg;
 
   /* slider fill + spoken summary */
