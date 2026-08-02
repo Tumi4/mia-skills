@@ -35,6 +35,11 @@ import time
 from collections import deque
 from pathlib import Path
 
+from fastapi import FastAPI, Query
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastmcp import Client
+from pydantic import BaseModel, Field
+
 from agent import (
     AgentError,
     MiaAgent,
@@ -43,10 +48,6 @@ from agent import (
     _result_payload,
     human_items,
 )
-from fastapi import FastAPI, Query
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastmcp import Client
-from pydantic import BaseModel, Field
 
 logger = logging.getLogger("mia.agent.server")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")

@@ -6,3 +6,11 @@ target-version = "py311"
 
 [lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+
+[lint.isort]
+# `agent` and `server` are modules inside deploy/agent/, loaded by path rather
+# than as a package. Without naming them, ruff classifies them differently
+# depending on which directory it is invoked from - first-party from inside
+# deploy/agent, third-party from the repo root - so a file that lints clean
+# locally fails in CI. Naming them makes the ordering the same everywhere.
+known-first-party = ["agent", "server"]
