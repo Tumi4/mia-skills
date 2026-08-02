@@ -77,7 +77,7 @@ See [`docs/integration.md`](docs/integration.md) for Claude Desktop, Cursor, the
 | `integrate-mpesa` | 🇰🇪 Kenya | Planned | — | — |
 | `register-company-rwanda` | 🇷🇼 Rwanda (RDB) | Planned | — | — |
 
-**200 tests passing** across the library (195 skill tests + 5 gateway contract tests). The hosted [gateway](deploy/gateway/README.md) serves the seven live skills — 27 tools — from one MCP URL; scaffolds are never mounted on the hosted surface.
+**200 tests passing** across the library (195 skill tests + 5 gateway contract tests), plus 73 more covering the agent and web surfaces — 273 in the repo. The hosted [gateway](deploy/gateway/README.md) serves the seven live skills — 27 tools — from one MCP URL; scaffolds are never mounted on the hosted surface.
 
 Want to contribute a skill? See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
@@ -93,14 +93,38 @@ mia-skills/
 │   │   └── tests/                 # required: pytest
 │   └── ...
 ├── deploy/gateway/                # hosted MCP endpoint composing the LIVE skills
+├── deploy/agent/                  # the web surfaces: landing page, chat, POST /chat
+│   └── static/index.html          # the landing page (constants generated, see below)
+├── scripts/gen_web_constants.py   # regenerates the page's JS constants from the Python
 ├── docs/                          # integration guides, architecture
-├── .github/workflows/             # CI: pytest across all skills + gateway, ruff
-├── render.yaml                    # one-click Render deployment for the gateway
+├── .github/workflows/             # CI: pytest, the constants guard, ruff
+├── render.yaml                    # Render deployment: gateway + agent
+├── ruff.toml                      # lint config for everything outside skills/
 ├── ARCHITECTURE.md                # technical architecture
 ├── CONTRIBUTING.md                # how to add a skill
 ├── CLAUDE.md                      # orientation for Claude Code
 └── README.md                      # this file
 ```
+
+### One source of truth for every number
+
+The landing page renders a live turnover-tax and VAT comparison in the browser,
+before any network call, so it works on a bad connection and with JavaScript off.
+That needs the thresholds in JavaScript as well as Python — and two copies of a tax
+threshold is exactly the failure this project exists to argue against.
+
+So the JavaScript copy is **generated**, fenced between sentinels, and CI asserts it
+still matches:
+
+```bash
+python scripts/gen_web_constants.py           # regenerate after changing a skill
+python scripts/gen_web_constants.py --check   # what CI runs; fails on drift
+```
+
+When the page is served by `deploy/agent` it additionally calls `GET /api/position`,
+which computes both columns through the real skills. The generated constants are the
+offline fallback; the live answer wins when it arrives. Neither path can drift from
+the Python without the build going red.
 
 ## License
 

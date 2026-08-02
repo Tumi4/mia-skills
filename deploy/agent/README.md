@@ -17,7 +17,8 @@ This is a **deployment artifact, not a skill.** Each skill stays standalone unde
 Two files, one seam:
 
 - **`agent.py`** — the core. No web framework, no HTTP, nothing channel-specific. It imports the gateway **in-process** and drives it with `fastmcp.Client(gateway)` — same repo, same process, so there is no network hop and no dependency on the deployed gateway being up. It lists the gateway's tools, converts them to Anthropic tool schemas, and runs a proper tool-use loop (the model may call several tools before answering).
-- **`server.py`** — FastAPI. `POST /chat` is the channel-agnostic seam; `GET /` is the browser chat page; `GET /healthz` is for uptime checks.
+- **`server.py`** — FastAPI. `GET /` serves the landing page; `GET /ask` is the browser chat page; `POST /chat` is the channel-agnostic seam; `GET /api/position` computes the landing page's two columns through the real skills (no model call, no API key, no rate limit); `GET /healthz` is for uptime checks.
+- **`static/index.html`** — the landing page. Its JS constants are generated from the Python skills by `scripts/gen_web_constants.py` and guarded in CI; never hand-edit between the `MIA:GENERATED-CONSTANTS` sentinels.
 
 ### The system prompt is the product
 
@@ -87,7 +88,21 @@ Errors come back as clean JSON, never a stack trace:
 | 503 | `missing_api_key` | `ANTHROPIC_API_KEY` not set on the server |
 | 502 | `upstream_error` | The model call failed |
 
-### `GET /` — the browser chat page
+### `GET /api/position` — the landing page's figures, from the real skills
+
+```
+GET /api/position?turnover=1400000
+```
+
+Returns both columns — current law and the superseded pre-April-2026 rules — computed
+by the same skills the MCP tools run, plus the `requires_human` steps they flagged.
+
+Deliberately model-free: no Anthropic call, no `ANTHROPIC_API_KEY`, no rate limit. The
+landing page must stay instant and free to serve. The page ships with generated
+constants so it is already correct before this responds; a slow or failed request
+leaves the offline figures in place rather than blanking the card.
+
+### `GET /ask` — the browser chat page
 
 One self-contained HTML page: inline CSS and JS, no CDN, no build step, no `localStorage`. Plain and fast, because it will be opened by founders on mid-range phones over patchy data. The session id lives in a JS variable for the life of the tab — reload for a fresh conversation.
 

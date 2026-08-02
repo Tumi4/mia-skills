@@ -1,6 +1,6 @@
 # Integrating mia-skills
 
-Four ways to call the library, from zero-setup to fully custom. Every path exposes the same honest contract: verified constants (source URL + date in each skill), structured outputs, explicit `requires_human` steps, and a `get_status` tool per skill reporting its rule basis and last rule check.
+Five ways to call the library, from zero-setup to fully custom. Every path exposes the same honest contract: verified constants (source URL + date in each skill), structured outputs, explicit `requires_human` steps, and a `get_status` tool per skill reporting its rule basis and last rule check.
 
 ---
 
@@ -14,6 +14,24 @@ The fastest path, especially for non-developers: the gateway at `deploy/gateway`
 Tools are namespaced per skill: `turnover_calculate_turnover_tax`, `vat_check_registration_required`, `paye_calculate_monthly_paye`, `sdl_calculate_sdl`, `carbon_calculate_carbon_tax`, `provtax_calculate_provisional_payment`, `s12b_calculate_deduction`, plus `<namespace>_get_status` everywhere and `gateway_status` for the full inventory.
 
 Deployment walkthrough: [`deploy/gateway/README.md`](../deploy/gateway/README.md).
+
+---
+
+## 1b. The web surfaces — nothing to install
+
+`deploy/agent` serves three things from one Render service:
+
+- **`/`** — the landing page: a live turnover-tax and VAT comparison. Enter a turnover
+  and it shows today's answer beside the pre-April-2026 answer most tools still give.
+  Figures come from `GET /api/position`, which runs the real skills; the page carries
+  generated constants as an offline fallback so it works on a bad connection and with
+  JavaScript off.
+- **`/ask`** — a plain chat page for asking in your own words. Same tools, same answers.
+- **`POST /chat`** — the channel-agnostic seam. A WhatsApp or Slack adapter is a thin
+  translator into this one call; nothing channel-specific lives in the agent core.
+
+`GET /api/position` needs no API key and costs nothing to serve — it is a pure
+calculation. `POST /chat` calls a model and is rate limited.
 
 ---
 

@@ -71,6 +71,7 @@ REGISTRATION_DEADLINE_BUSINESS_DAYS = 21
 # past period of 12 months" (below the compulsory threshold). Raised from R50,000
 # effective 1 April 2026 (Budget 2026).
 VOLUNTARY_REGISTRATION_MINIMUM_ZAR = 120_000.0
+PREVIOUS_VOLUNTARY_MINIMUM_ZAR = 50_000.0  # pre-1 April 2026, for transitional warnings
 
 # Alternative voluntary routes exist below R120k (surfaced in notes, not automated):
 # monthly supplies > R4,200 patterns, written contracts promising R120k+ in the
@@ -246,7 +247,8 @@ async def check_registration_required(input: RegistrationCheckInput) -> Registra
         f"Thresholds current from {THRESHOLD_EFFECTIVE_DATE} (Budget 2026): compulsory above "
         f"R{MANDATORY_REGISTRATION_THRESHOLD_ZAR:,.0f} in any consecutive 12-month period "
         f"(previously R{PREVIOUS_MANDATORY_THRESHOLD_ZAR:,.0f}); voluntary once past-12-month "
-        f"supplies exceed R{VOLUNTARY_REGISTRATION_MINIMUM_ZAR:,.0f} (previously R50,000)."
+        f"supplies exceed R{VOLUNTARY_REGISTRATION_MINIMUM_ZAR:,.0f} "
+        f"(previously R{PREVIOUS_VOLUNTARY_MINIMUM_ZAR:,.0f})."
     )
     if registration_type == "not_yet_eligible":
         notes += (
@@ -351,6 +353,12 @@ async def get_status() -> dict:
         "vat_rate": VAT_RATE,
         "mandatory_threshold_zar": MANDATORY_REGISTRATION_THRESHOLD_ZAR,
         "voluntary_minimum_zar": VOLUNTARY_REGISTRATION_MINIMUM_ZAR,
+        # The superseded thresholds, exposed so a caller can show what changed
+        # without hard-coding the old numbers itself. Effective date above.
+        "previous_mandatory_threshold_zar": PREVIOUS_MANDATORY_THRESHOLD_ZAR,
+        "previous_voluntary_minimum_zar": PREVIOUS_VOLUNTARY_MINIMUM_ZAR,
+        "thresholds_effective": THRESHOLD_EFFECTIVE_DATE,
+        "registration_deadline_business_days": REGISTRATION_DEADLINE_BUSINESS_DAYS,
         "disclaimer": "Determination tool, not tax advice. Confirm with a registered tax practitioner.",
         "last_rule_check": "2026-07",
     }

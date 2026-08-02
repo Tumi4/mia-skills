@@ -61,8 +61,10 @@ class TestHealth:
 
 
 class TestChatPage:
-    def test_index_renders(self):
-        response = client.get("/")
+    """The chat page moved to /ask when the landing page took / (see test_position.py)."""
+
+    def test_ask_renders(self):
+        response = client.get("/ask")
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
         assert "<form" in response.text
@@ -70,14 +72,14 @@ class TestChatPage:
 
     def test_page_is_self_contained(self):
         """No CDN, no external assets, no localStorage - it loads on bad data."""
-        html = response_text = client.get("/").text
+        html = response_text = client.get("/ask").text
         assert "<style>" in html and "<script>" in html
         assert "localStorage" not in html
         for marker in ("cdn.", "https://unpkg", "https://cdnjs", "googleapis"):
             assert marker not in response_text
 
     def test_page_posts_to_the_channel_agnostic_seam(self):
-        assert "'/chat'" in client.get("/").text
+        assert "'/chat'" in client.get("/ask").text
 
 
 # ─── /chat ──────────────────────────────────────────────────────────────────────

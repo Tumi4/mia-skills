@@ -1,16 +1,22 @@
 """
 MIA agent service - FastAPI surface over the channel-agnostic agent core.
 
-Two surfaces, one seam:
+Surfaces:
 
-    POST /chat    {session_id, message} -> {reply, tools_called[], requires_human[]}
-    GET  /        a self-contained browser chat page (inline CSS/JS, no CDN)
-    GET  /healthz uptime check
+    GET  /             the landing page - a live turnover-tax + VAT instrument
+    GET  /ask          a self-contained browser chat page (inline CSS/JS, no CDN)
+    POST /chat         {session_id, message} -> {reply, tools_called[], requires_human[]}
+    GET  /api/position ?turnover= -> both columns, computed by the real skills
+    GET  /healthz      uptime check
 
-POST /chat is the seam every future channel adapter uses. A WhatsApp webhook or
-a Slack event handler becomes a thin translator into that one call - see the
-"Adding a channel" section of deploy/agent/README.md. Nothing channel-specific
-belongs in agent.py.
+POST /chat is the seam every future channel adapter uses. GET /api/position is a
+separate, deliberately model-free seam: the landing page must stay instant and
+free to serve, so it calls the skills directly through the gateway and never
+touches Anthropic. That is why it has no rate limit and no API key requirement.
+
+A WhatsApp webhook or a Slack event handler becomes a thin translator into
+POST /chat - see the "Adding a channel" section of deploy/agent/README.md.
+Nothing channel-specific belongs in agent.py.
 
 Run locally:
     pip install -r requirements.txt
@@ -27,12 +33,20 @@ import logging
 import os
 import time
 from collections import deque
+from pathlib import Path
 
-from fastapi import FastAPI
+from agent import (
+    AgentError,
+    MiaAgent,
+    MissingAPIKeyError,
+    TurnLimitError,
+    _result_payload,
+    human_items,
+)
+from fastapi import FastAPI, Query
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastmcp import Client
 from pydantic import BaseModel, Field
-
-from agent import AgentError, MiaAgent, MissingAPIKeyError, TurnLimitError
 
 logger = logging.getLogger("mia.agent.server")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
@@ -60,6 +74,14 @@ app = FastAPI(
 )
 
 agent = MiaAgent()
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+LANDING_PAGE = STATIC_DIR / "index.html"
+
+# The landing page shares the agent's gateway so both surfaces answer from the
+# same in-process skills. Reused rather than re-imported: loading the gateway
+# executes seven skill modules, and doing that twice per process is waste.
+_position_gateway = agent._gateway
 
 # session_id -> timestamps of recent requests. In-memory and per-process, which
 # is the right scope for a single Render web service; move to Redis before
@@ -155,6 +177,141 @@ async def chat(request: ChatRequest):
         tools_called=result.tools_called,
         requires_human=result.requires_human,
     )
+
+
+def _zar(value: float) -> str:
+    """Rand, grouped the South African way: R1 400 000, not R1,400,000.
+
+    The page uses spaces throughout, and live and offline answers must be
+    indistinguishable - a separator that changes when the network arrives would
+    read as two different systems disagreeing.
+    """
+    return "R" + f"{value:,.0f}".replace(",", " ")
+
+
+def _short_millions(value: float) -> str:
+    """R2.3m / R1m - the compact form the card's verdicts use."""
+    millions = value / 1_000_000
+    text = f"{millions:.1f}".rstrip("0").rstrip(".")
+    return f"R{text}m"
+
+
+def _vat_now(vat: dict) -> dict:
+    """The VAT column as the live skill reported it."""
+    kind = vat.get("registration_type")
+    mandatory = vat.get("mandatory_threshold_zar") or 0
+    voluntary = vat.get("voluntary_minimum_zar") or 0
+    if kind == "mandatory":
+        status = "Compulsory"
+        note = (
+            f"Over {_short_millions(mandatory)} — register within "
+            f"{vat.get('registration_deadline_business_days', 21)} business days"
+        )
+    elif kind == "voluntary_available":
+        status = "Voluntary"
+        note = f"Above {_zar(voluntary)}, below the {_short_millions(mandatory)} compulsory threshold"
+    else:
+        status = "Not yet"
+        note = f"Under {_zar(voluntary)} — other routes may still apply"
+    return {"vat_status": status, "vat_note": note}
+
+
+def _vat_then(turnover: float, status: dict) -> dict:
+    """The VAT column as the superseded thresholds would have decided it.
+
+    Reconstructed rather than computed by the skill: the skill only implements
+    current law, which is correct - it should not offer to answer as if the old
+    rules still applied. The superseded figures come from the skill's own
+    get_status output, so this stays traceable to one source of truth.
+    """
+    mandatory = status.get("previous_mandatory_threshold_zar")
+    voluntary = status.get("previous_voluntary_minimum_zar")
+    days = status.get("registration_deadline_business_days")
+    if mandatory is None or voluntary is None:
+        # The skill stopped publishing the old thresholds; say so rather than guess.
+        return {"vat_status": None, "vat_note": "Superseded thresholds unavailable."}
+
+    if turnover > mandatory:
+        return {
+            "vat_status": "Compulsory",
+            "vat_note": (f"Old {_short_millions(mandatory)} threshold — {days} business days to register"),
+        }
+    if turnover > voluntary:
+        return {"vat_status": "Voluntary", "vat_note": f"Old {_zar(voluntary)} voluntary minimum"}
+    return {"vat_status": "Not yet", "vat_note": f"Under the old {_zar(voluntary)} minimum"}
+
+
+@app.get("/api/position")
+async def position(
+    turnover: float = Query(..., ge=0, le=1_000_000_000, description="Annual turnover in rand"),
+):
+    """Both columns of the landing page's comparison, computed by the real skills.
+
+    The page ships with generated constants so it works before this responds (and
+    with JS off, and if this fails). This endpoint is what makes the served page
+    honest: the figures come from the same code the MCP tools run, not from a
+    copy of the rules that could drift.
+
+    Deliberately model-free - no Anthropic call, no API key, no rate limit. It is
+    a pure calculation and must stay free to serve.
+    """
+    try:
+        async with Client(_position_gateway) as mcp:
+            now_tax = _result_payload(
+                await mcp.call_tool(
+                    "turnover_calculate_turnover_tax",
+                    {"input": {"annual_turnover_zar": turnover, "tax_year": 2027}},
+                )
+            )
+            then_tax = _result_payload(
+                await mcp.call_tool(
+                    "turnover_calculate_turnover_tax",
+                    {"input": {"annual_turnover_zar": turnover, "tax_year": 2026}},
+                )
+            )
+            vat = _result_payload(
+                await mcp.call_tool(
+                    "vat_check_registration_required",
+                    {"input": {"rolling_12m_taxable_supplies_zar": turnover}},
+                )
+            )
+            vat_status = _result_payload(await mcp.call_tool("vat_get_status", {}))
+    except Exception as exc:
+        # The page falls back to its generated constants on any non-200, so this
+        # degrades to "the offline answer" rather than to a blank card.
+        logger.exception("position lookup failed for turnover=%s", turnover)
+        return JSONResponse(
+            status_code=502,
+            content={
+                "error": "calculation_failed",
+                "detail": f"Could not compute that position just now ({type(exc).__name__}).",
+            },
+        )
+
+    human = sorted(set(human_items(now_tax) + human_items(vat)))
+
+    return {
+        "turnover_zar": turnover,
+        "now": {
+            "basis": "Current law - 2027 year of assessment",
+            "turnover_tax_zar": now_tax.get("turnover_tax_zar"),
+            "band_applied": now_tax.get("band_applied"),
+            "qualifies": not now_tax.get("exceeds_qualifying_limit"),
+            "qualifying_limit_zar": now_tax.get("qualifying_limit_zar"),
+            **_vat_now(vat),
+        },
+        "then": {
+            "basis": "Superseded - rules before 1 April 2026",
+            "turnover_tax_zar": then_tax.get("turnover_tax_zar"),
+            "band_applied": then_tax.get("band_applied"),
+            "qualifies": not then_tax.get("exceeds_qualifying_limit"),
+            "qualifying_limit_zar": then_tax.get("qualifying_limit_zar"),
+            **_vat_then(turnover, vat_status),
+        },
+        "requires_human": human,
+        "computed_by": "mia-skills (live)",
+        "disclaimer": "This is a calculation, not tax advice.",
+    }
 
 
 @app.get("/healthz")
@@ -336,7 +493,25 @@ not tax advice - always have a registered tax practitioner confirm before you fi
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
-    """The browser chat page - the agent's first surface."""
+    """The landing page - a live turnover-tax and VAT instrument.
+
+    Read from disk per request rather than cached at import so that editing the
+    page during local development does not need a restart. The file is ~37KB;
+    on Render it is served from the container's own filesystem.
+
+    If the file is missing (a partial deploy, a bad build), fall back to the chat
+    page rather than 500 - a working chat surface beats an error page.
+    """
+    try:
+        return HTMLResponse(content=LANDING_PAGE.read_text(encoding="utf-8"))
+    except OSError:
+        logger.exception("landing page missing at %s - serving the chat page instead", LANDING_PAGE)
+        return HTMLResponse(content=CHAT_PAGE)
+
+
+@app.get("/ask", response_class=HTMLResponse)
+async def ask():
+    """The browser chat page - where a founder asks in their own words."""
     return HTMLResponse(content=CHAT_PAGE)
 
 

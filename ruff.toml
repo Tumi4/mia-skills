@@ -1,0 +1,8 @@
+# Root ruff config. Each skill carries its own pyproject.toml with the same
+# settings; this covers everything that is not a skill - deploy/ and scripts/ -
+# so the deployment code is held to the same standard as the library.
+line-length = 110
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]

@@ -39,6 +39,15 @@ jobs:
           cd deploy/agent
           python -m pytest tests -q
 
+      - name: The landing page's constants must match the Python
+        # The page ships a JS copy of the turnover-tax and VAT thresholds so it
+        # works offline and without JS. That copy is GENERATED. If someone edits
+        # a threshold in a skill and forgets to regenerate, the page would quietly
+        # show the old number - the exact failure this project exists to argue
+        # against. This fails the build instead.
+        run: |
+          python scripts/gen_web_constants.py --check
+
       - name: Lint (ruff)
         run: |
-          ruff check skills deploy
+          ruff check skills deploy scripts

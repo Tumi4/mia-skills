@@ -145,13 +145,29 @@
     animation:wash .62s ease-out forwards}
   .mval.flip,.mstate.flip{animation:flip .34s cubic-bezier(.2,.7,.3,1)}
 
-  .delta{padding:15px 18px;background:var(--navy);color:#eaf1fa;font-size:13.5px;line-height:1.5;
+  /* The verdict sentence is the one place the page speaks rather than reports,
+     so it gets the document voice — serif, larger, gold italic on the operative
+     words. Everything around it is instrumentation; this is the reading of it. */
+  .delta{padding:17px 18px;background:var(--navy);color:#eaf1fa;line-height:1.4;
     display:flex;gap:13px;align-items:flex-start}
   .delta .r{width:2px;background:var(--gold);align-self:stretch;flex-shrink:0;min-height:34px}
-  .delta b{color:var(--gold);font-weight:700}
+  .delta #deltatext{font-family:var(--serif);font-size:clamp(16px,3.1vw,21px);letter-spacing:-.01em}
+  .delta b{color:var(--gold);font-weight:400;font-style:italic}
+  .dmeta{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:#8fa6c4;padding:0 18px 13px;background:var(--navy);margin-top:-2px}
+
+  /* The card carries its own context top and bottom: people crop this straight
+     into a WhatsApp group, and a screenshot with no sources is just a claim. */
   .srcline{padding:11px 18px;background:var(--paper2);border-top:1px solid var(--line);
-    font-size:11px;color:var(--muted);line-height:1.55;word-break:break-word}
+    font-size:11px;color:var(--muted);line-height:1.55;word-break:break-word;
+    display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
   .srcline a{color:var(--teal-d)}
+  .srcline .gw{font-family:var(--mono);font-size:10.5px;color:var(--navy);font-weight:700;
+    letter-spacing:.02em;white-space:nowrap}
+  .livetag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--teal-d);border:1px solid var(--teal);padding:1px 6px;border-radius:2px;
+    white-space:nowrap;opacity:0;transition:opacity .3s}
+  .livetag.on{opacity:1}
 
   /* ── drift table ─────────────────────────────────── */
   .drift{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px;background:#fff;
@@ -178,9 +194,14 @@
   .rline .k{color:#a8bcd6}
   .rhi{color:#4fd8c6;font-weight:700}
   .rgold{color:var(--gold)}
-  .rflags{white-space:normal}
-  .rflag{color:#ffdcac;display:block;margin-top:5px;font-size:12px;line-height:1.55;padding-left:14px;
-    text-indent:-14px}
+  /* The limits are the product, not the fine print. They leave the mono log voice
+     and become prose — larger than the result they qualify, because that is the
+     honest hierarchy: what a tool won't do matters more than what it will. */
+  .limits{margin-top:22px;padding-top:16px;border-top:1px solid #1c3557;white-space:normal}
+  .limits .step{color:var(--gold);margin-bottom:11px}
+  .rflag{color:#f2e6d2;display:block;font-family:var(--sans);font-size:14px;line-height:1.5;
+    padding-left:13px;border-left:2px solid var(--gold);margin-bottom:10px}
+  .rflag:last-child{margin-bottom:0}
 
   /* ── surfaces ────────────────────────────────────── */
   .urlbox{background:var(--navy);color:#9fe7dd;padding:15px 17px;margin-top:22px;
@@ -245,7 +266,7 @@
 
 <div class="nav"><div class="wrap">
   <div class="brand">MIA<i>·</i>Made in Africa</div>
-  <a class="navlink" href="#connect">Connect it to your AI →</a>
+  <a class="navlink" href="/ask">Try it in your own words →</a>
 </div></div>
 
 <!-- ═══ 01 · THE INSTRUMENT ═════════════════════════ -->
@@ -295,14 +316,14 @@
         <span class="colsub">Read off SARS, 30 July 2026</span>
         <div class="metric">
           <div class="mlabel">Turnover tax</div>
-          <div class="mval" id="n-tax">R12,500</div>
-          <div class="mnote" id="n-band">R3,500 + 2% of turnover above R950,000</div>
+          <div class="mval" id="n-tax">R12 500</div>
+          <div class="mnote" id="n-band">R3 500 + 2% of turnover above R950 000</div>
           <span class="verdict v-ok" id="n-qual">Qualifies · under R2.3m</span>
         </div>
         <div class="metric">
           <div class="mlabel">VAT registration</div>
           <div class="mstate" id="n-vat">Voluntary</div>
-          <div class="mnote" id="n-vatnote">Above R120,000, below the R2.3m compulsory threshold</div>
+          <div class="mnote" id="n-vatnote">Above R120 000, below the R2.3m compulsory threshold</div>
         </div>
       </div>
 
@@ -311,8 +332,8 @@
         <span class="colsub">Pre-April 2026 rules — what most tools still believe</span>
         <div class="metric">
           <div class="mlabel">Turnover tax</div>
-          <div class="mval" id="o-tax">R26,150</div>
-          <div class="mnote" id="o-band">Old bands: R6,650 + 3% of turnover above R750,000</div>
+          <div class="mval" id="o-tax">R26 150</div>
+          <div class="mnote" id="o-band">Old bands: R6 650 + 3% of turnover above R750 000</div>
           <span class="verdict v-no" id="o-qual">Does not qualify · over R1m</span>
         </div>
         <div class="metric">
@@ -324,14 +345,16 @@
     </div>
 
     <div class="delta"><span class="r"></span>
-      <span id="deltatext">At R1,400,000 the two answers aren't <b>different amounts</b> —
+      <span id="deltatext">At R1 400 000 the two answers aren't <b>different amounts</b> —
       they're <b>different outcomes</b>. The stale one says you don't qualify at all.</span></div>
+    <div class="dmeta">Thresholds moved 1 Apr 2026 · this is a calculation, not tax advice</div>
 
     <div class="srcline">
-      Sources: <a href="https://www.sars.gov.za/tax-rates/turnover-tax/" target="_blank" rel="noopener">SARS turnover tax rates</a> ·
+      <span>Sources: <a href="https://www.sars.gov.za/tax-rates/turnover-tax/" target="_blank" rel="noopener">SARS turnover tax rates</a> ·
       <a href="https://www.sars.gov.za/types-of-tax/value-added-tax/register-for-vat/" target="_blank" rel="noopener">SARS VAT registration</a>
-      — both checked 30 July 2026. Budget 2026 raised both thresholds to R2.3m effective 1 April 2026.
-      A calculation, not tax advice.
+      — both checked 30 July 2026.</span>
+      <span class="livetag" id="livetag">computed live</span>
+      <span class="gw">mia-skills-gateway.onrender.com</span>
     </div>
   </div>
   <p class="sr-only" id="live" role="status" aria-live="polite"></p>
@@ -383,11 +406,11 @@
       <div class="rline">UIF (employee) <span class="rhi">R177.12</span> <span class="k">— capped</span></div>
       <div class="rline">take-home <span class="rgold">R26,147.88</span></div>
 
-      <div class="step">will not do for you</div>
-      <div class="rflags">
-        <span class="rflag">▸ Employer PAYE registration with SARS, monthly declarations and payment deadlines</span>
-        <span class="rflag">▸ UIF registration with the Department of Employment and Labour — a separate obligation</span>
-        <span class="rflag">▸ Bonuses, allowances, fringe benefits and retirement deductions change this — confirm with a payroll provider</span>
+      <div class="limits">
+        <div class="step">Requires a human — MIA will not do this for you</div>
+        <span class="rflag">Employer PAYE registration with SARS, monthly declarations and payment deadlines.</span>
+        <span class="rflag">UIF registration with the Department of Employment and Labour — a separate obligation.</span>
+        <span class="rflag">Bonuses, allowances, fringe benefits and retirement deductions change this figure — confirm with a payroll provider.</span>
       </div>
 
       <div class="step">rule basis</div>
@@ -411,12 +434,15 @@
     <span id="gwurl">https://mia-skills-gateway.onrender.com/mcp</span>
     <button type="button" onclick="copyUrl()" id="copybtn">Copy</button>
   </div>
+  <p class="small" id="copynote" role="status" aria-live="polite" style="margin-top:9px;min-height:19px"></p>
 
   <div class="grid2">
     <div class="card"><h3>Claude</h3><p>Settings → Connectors → add the URL. Then ask in plain language,
       in any of your languages.</p></div>
     <div class="card"><h3>ChatGPT</h3><p>Custom connector on Plus and above. Same address, same answers.</p></div>
     <div class="card"><h3>Cursor &amp; custom agents</h3><p>Standard MCP over HTTP. Build MIA into your own product.</p></div>
+    <div class="card"><h3>Right here</h3><p>Nothing to install — <a href="/ask">ask MIA in your own
+      words</a> on this site, same tools, same answers.</p></div>
     <div class="card"><h3>WhatsApp <span class="small">— next</span></h3><p>Where founders actually are.
       Scoped to these tasks, by design and by Meta's rules.</p></div>
   </div>
@@ -482,23 +508,20 @@
 </div></div>
 
 <script>
-/* MIA:GENERATED-CONSTANTS:START — do not hand-edit between these sentinels.
-   Rewritten by scripts/gen_web_constants.py from the Python skills; a CI
-   check asserts they match. Design changes outside the sentinels only. */
-/* ─────────────────────────────────────────────────────────────
-   GENERATED CONSTANTS — mirrored from the Python skills.
-   Source of truth:
+/* MIA:GENERATED-CONSTANTS:START - do not hand-edit between these sentinels.
+   Generated by scripts/gen_web_constants.py from the Python skills:
      skills/calculate-turnover-tax-south-africa/server.py
      skills/check-vat-registration-south-africa/server.py
-   Generated 1 August 2026. If those constants change, regenerate.
-   When this page is served by deploy/agent, it prefers the live
-   API below and these are only the offline fallback.
-   ───────────────────────────────────────────────────────────── */
+   CI runs `python scripts/gen_web_constants.py --check` and fails if these
+   drift. To change a number, change it in the skill and regenerate.
+   When this page is served by deploy/agent it prefers the live /api/position
+   endpoint; these are the offline fallback and the no-JS render. */
 const T2027 = [[600000,0,0.01],[950000,3500,0.02],[1400000,12500,0.03]];
 const T2026 = [[335000,0,0.01],[500000,1650,0.02],[750000,6650,0.03]];
 const LIMIT_NOW = 2300000, LIMIT_OLD = 1000000;
 const VAT_NOW = 2300000, VAT_VOL_NOW = 120000;
 const VAT_OLD = 1000000, VAT_VOL_OLD = 50000;
+const VAT_DEADLINE_DAYS = 21;
 /* MIA:GENERATED-CONSTANTS:END */
 
 const MAX = 5000000;
@@ -515,7 +538,10 @@ function bandLabel(amount, table){
   const [floor, base, rate] = b;
   return (base ? "R" + fmt(base) + " + " : "") + Math.round(rate*100) + "% of turnover above R" + fmt(floor);
 }
-const fmt = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+/* South African convention groups with spaces, not commas: R1 400 000. One
+   separator everywhere on the card — the input, the figures and the verdict
+   sentence all read the same way. */
+const fmt = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 const rand = n => "R" + fmt(n);
 const $ = id => document.getElementById(id);
 
@@ -543,9 +569,9 @@ function render(v){
   qn.textContent = overNow ? "Does not qualify · over R2.3m" : "Qualifies · under R2.3m";
 
   let vatNow, vatNoteNow;
-  if (v > VAT_NOW){ vatNow = "Compulsory"; vatNoteNow = "Over R2.3m — register within 21 business days"; }
-  else if (v > VAT_VOL_NOW){ vatNow = "Voluntary"; vatNoteNow = "Above R120,000, below the R2.3m compulsory threshold"; }
-  else { vatNow = "Not yet"; vatNoteNow = "Under R120,000 — other routes may still apply"; }
+  if (v > VAT_NOW){ vatNow = "Compulsory"; vatNoteNow = "Over R2.3m — register within " + VAT_DEADLINE_DAYS + " business days"; }
+  else if (v > VAT_VOL_NOW){ vatNow = "Voluntary"; vatNoteNow = "Above R120 000, below the R2.3m compulsory threshold"; }
+  else { vatNow = "Not yet"; vatNoteNow = "Under R120 000 — other routes may still apply"; }
   $("n-vat").textContent = vatNow; $("n-vatnote").textContent = vatNoteNow;
 
   /* ── the stale answer ── */
@@ -558,9 +584,9 @@ function render(v){
   qo.textContent = overOld ? "Does not qualify · over R1m" : "Qualifies · under R1m";
 
   let vatOld, vatNoteOld;
-  if (v > VAT_OLD){ vatOld = "Compulsory"; vatNoteOld = "Old R1m threshold — 21 business days to register"; }
-  else if (v > VAT_VOL_OLD){ vatOld = "Voluntary"; vatNoteOld = "Old R50,000 voluntary minimum"; }
-  else { vatOld = "Not yet"; vatNoteOld = "Under the old R50,000 minimum"; }
+  if (v > VAT_OLD){ vatOld = "Compulsory"; vatNoteOld = "Old R1m threshold — " + VAT_DEADLINE_DAYS + " business days to register"; }
+  else if (v > VAT_VOL_OLD){ vatOld = "Voluntary"; vatNoteOld = "Old R50 000 voluntary minimum"; }
+  else { vatOld = "Not yet"; vatNoteOld = "Under the old R50 000 minimum"; }
   $("o-vat").textContent = vatOld; $("o-vatnote").textContent = vatNoteOld;
 
   /* ── the flip: animate only what changed meaning ── */
@@ -596,7 +622,7 @@ function render(v){
 
   /* slider fill + spoken summary */
   $("slider").style.setProperty("--pct", (v / MAX * 100) + "%");
-  $("slider").setAttribute("aria-valuetext", "R" + fmt(v).replace(/,/g, " "));
+  $("slider").setAttribute("aria-valuetext", rand(v));
   clearTimeout(liveTimer);
   liveTimer = setTimeout(() => {
     $("live").textContent =
@@ -607,11 +633,12 @@ function render(v){
 
 function setValue(v, fromInput){
   v = Math.max(0, Math.min(MAX, v || 0));
-  if (!fromInput) $("turnover").value = fmt(v).replace(/,/g, " ");
+  if (!fromInput) $("turnover").value = fmt(v);
   $("slider").value = v;
   document.querySelectorAll(".chip").forEach(c =>
     c.setAttribute("aria-pressed", +c.dataset.v === v ? "true" : "false"));
   render(v);
+  askLive(v);
 }
 
 /* Put the threshold ticks exactly where the generated constants say they are,
@@ -625,11 +652,58 @@ $("turnover").addEventListener("blur", e => setValue(+e.target.value.replace(/[^
 document.querySelectorAll(".chip").forEach(c =>
   c.addEventListener("click", () => setValue(+c.dataset.v)));
 
+/* ── the live layer ──────────────────────────────────────────────────────────
+   Everything above computes from the generated constants, so the page is
+   correct and interactive before any request is made — and stays correct with
+   JS-only-partly-working, on a dead connection, or served as a bare file.
+
+   When deploy/agent serves this page, /api/position answers from the same
+   Python the MCP tools run. We ask it, and if it agrees (it should — the
+   constants are generated from that Python) nothing visibly changes except a
+   small "computed live" tag. If it ever disagrees, the live answer wins,
+   because it is the one with the source of truth behind it.
+
+   Rules this must never break: a slow request must not blank the numbers, a
+   failed request must not show an error, and a stale reply must not overwrite
+   a newer one. */
+let liveSeq = 0;
+let liveTimerFetch;
+
+function applyLive(data, seq){
+  if (seq !== liveSeq) return;                 // a newer request has already landed
+  const n = data.now, o = data.then;
+  if (!n || !o || n.turnover_tax_zar == null || o.turnover_tax_zar == null) return;
+  $("n-tax").textContent = rand(n.turnover_tax_zar);
+  $("o-tax").textContent = rand(o.turnover_tax_zar);
+  if (n.band_applied) $("n-band").textContent = n.band_applied.replace(/,/g, " ");
+  if (o.band_applied) $("o-band").textContent = "Old bands: " + o.band_applied.replace(/,/g, " ");
+  if (n.vat_status){ $("n-vat").textContent = n.vat_status; $("n-vatnote").textContent = n.vat_note || ""; }
+  if (o.vat_status){ $("o-vat").textContent = o.vat_status; $("o-vatnote").textContent = o.vat_note || ""; }
+  $("livetag").classList.add("on");
+}
+
+function askLive(v){
+  clearTimeout(liveTimerFetch);
+  liveTimerFetch = setTimeout(() => {
+    const seq = ++liveSeq;
+    fetch("/api/position?turnover=" + encodeURIComponent(v), { headers: { Accept: "application/json" } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) applyLive(d, seq); })
+      .catch(() => {});                        // offline is a normal state here, not an error
+  }, 250);                                     // one request per pause, not one per drag frame
+}
+
 function copyUrl(){
   const url = $("gwurl").textContent.trim();
-  navigator.clipboard?.writeText(url).then(() => {
-    const b = $("copybtn"); b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1600);
-  });
+  const b = $("copybtn");
+  const done = () => {
+    b.textContent = "Copied";
+    $("copynote").textContent = "Paste it into your AI tool's connector settings.";
+    setTimeout(() => b.textContent = "Copy", 1800);
+  };
+  const manual = () => { $("copynote").textContent = "Select the address above and copy it."; };
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, manual);
+  else manual();                               // no clipboard API (http, old browser) — say so
 }
 
 function joinList(e){
