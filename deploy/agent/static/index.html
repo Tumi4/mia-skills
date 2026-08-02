@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIA — the operating layer for African business</title>
+<meta name="description" content="Verified South African tax and compliance calculations, callable from any AI tool. Every number traced to a primary source.">
+<style>
+  :root{
+    --navy:#0B1E3B; --navy2:#13294B; --teal:#1FB8A6; --teal-d:#0C6A5F;
+    --gold:#E4B34A; --gold-ink:#6F5310; --paper:#F4F1EA; --ink:#0B1E3B;
+    --muted:#566378; --line:#dde3ec; --hair:#e8eaf0; --stale:#B4443A; --paper2:#FBFAF7;
+    /* Same red, a shade deeper — small text on the tinted verdict chip needs it
+       to clear 4.5:1. The column's large figures keep the brand --stale. */
+    --stale-ink:#A03A31;
+
+    /* One serif for the document voice, one sans for reading on a cheap phone,
+       one mono for every figure. All system fonts — no web font is worth the
+       data on a metered Android connection. */
+    --serif:Georgia,"Iowan Old Style","Times New Roman",Times,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 24px}
+
+  /* Focus is not decoration. Every interactive thing gets a visible ring. */
+  a:focus-visible,button:focus-visible,input:focus-visible{
+    outline:2.5px solid var(--teal-d);outline-offset:2px;border-radius:3px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* ── type system ─────────────────────────────────── */
+  h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;color:var(--navy)}
+  h1{font-size:clamp(32px,5.6vw,52px);line-height:1.08}
+  h2{font-size:clamp(24px,3.6vw,34px);line-height:1.16;margin-bottom:12px}
+  h3{font-family:var(--sans);font-size:15px;font-weight:700;letter-spacing:-.01em}
+  p{color:#3b4a61}
+  .lead{font-size:clamp(15.5px,1.9vw,18px);color:#3b4a61;margin-top:14px;max-width:640px}
+  .small{font-size:13px;color:var(--muted);line-height:1.55}
+  .kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--teal-d);margin-bottom:16px}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* scroll-margin keeps an anchored heading clear of the sticky nav — without it
+     the section kicker lands under the bar at mobile padding. */
+  section{padding:72px 0;border-bottom:1px solid var(--hair);scroll-margin-top:64px}
+
+  /* ── nav ─────────────────────────────────────────── */
+  .nav{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);z-index:60}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
+  .brand{font-family:var(--mono);font-weight:700;letter-spacing:.1em;font-size:13px;text-transform:uppercase}
+  .brand i{color:var(--teal-d);font-style:normal}
+  .navlink{font-size:13px;color:var(--navy);text-decoration:none;padding:7px 14px;
+    border:1px solid var(--line);border-radius:3px;background:#fff;white-space:nowrap}
+  .navlink:hover{border-color:var(--teal-d)}
+
+  /* ── 01 · the instrument ─────────────────────────── */
+  .hero{padding-top:48px;padding-bottom:60px}
+  .preamble{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--muted);
+    margin-bottom:18px;text-transform:uppercase}
+  .preamble b{color:var(--navy)}
+  .nojs{background:#fff7e6;border:1px solid var(--gold);border-left-width:3px;padding:12px 16px;
+    font-size:13.5px;color:var(--gold-ink);margin-top:20px}
+
+  /* The screenshot unit. Everything inside this card must make sense cropped
+     out of the page and dropped into a WhatsApp group. */
+  .instrument{background:#fff;border:1px solid var(--line);margin-top:26px;
+    box-shadow:0 10px 30px rgba(11,30,59,.07)}
+  .ihead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;
+    padding:11px 18px;background:var(--navy);color:#fff}
+  .ihead .b{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .ihead .b i{color:var(--teal);font-style:normal}
+  .ihead .d{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:#a8bcd6}
+
+  .ask{padding:22px 18px 20px;border-bottom:1px solid var(--line)}
+  .ask label{display:block;font-size:14.5px;font-weight:600;margin-bottom:12px;color:var(--navy)}
+  .inputrow{display:flex;align-items:baseline;gap:8px}
+  .rand{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--muted)}
+  #turnover{font-family:var(--mono);font-size:clamp(24px,5vw,30px);font-weight:700;
+    border:none;border-bottom:2px solid var(--teal);background:transparent;color:var(--navy);
+    width:100%;max-width:220px;padding:2px 0;font-variant-numeric:tabular-nums}
+
+  /* slider + threshold ticks: the cliffs should be visible before you hit them */
+  .scale{position:relative;margin-top:26px;padding-bottom:32px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;display:block;
+    background:linear-gradient(90deg,var(--teal) 0%,var(--teal) var(--pct,28%),#d5dbe5 var(--pct,28%));
+    cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;
+    background:#fff;border:3px solid var(--teal-d);cursor:grab;box-shadow:0 1px 5px rgba(11,30,59,.28)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;
+    border:3px solid var(--teal-d);cursor:grab;box-shadow:0 1px 5px rgba(11,30,59,.28)}
+  input[type=range]:focus-visible{outline:none}
+  input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--paper),0 0 0 5.5px var(--teal-d)}
+  input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px var(--paper),0 0 0 5.5px var(--teal-d)}
+  .tick{position:absolute;top:0;transform:translateX(-50%);pointer-events:none;text-align:center}
+  .tick i{display:block;width:1px;height:11px;background:#b9c3d2;margin:0 auto}
+  .tick span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;
+    color:var(--muted);margin-top:4px;white-space:nowrap}
+  .tick em{font-style:normal}
+  .tick.old i{background:var(--stale)} .tick.old span{color:var(--stale)}
+
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .chip{font-family:var(--mono);font-size:12px;padding:6px 11px;border:1px solid var(--line);
+    background:var(--paper2);color:#3b4a61;cursor:pointer;border-radius:2px}
+  .chip:hover{border-color:var(--teal-d)}
+  .chip[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+  /* The split stays a SPLIT at every width. Stacking it on a phone would
+     destroy the one comparison the whole page exists to make. */
+  .split{display:grid;grid-template-columns:1fr 1fr}
+  .col{padding:20px 18px 22px;position:relative}
+  .col.now{background:#fff}
+  .col.then{background:#faf7f5;border-left:1px solid var(--line)}
+  .coltitle{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.13em;
+    text-transform:uppercase;display:block}
+  .now .coltitle{color:var(--teal-d)} .then .coltitle{color:var(--stale)}
+  .colsub{font-size:11px;color:var(--muted);display:block;margin:3px 0 18px;line-height:1.4;min-height:31px}
+
+  .metric{padding-top:14px;border-top:1px solid var(--hair)}
+  .metric:first-of-type{padding-top:0;border-top:none}
+  .mlabel{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;
+    color:var(--muted);margin-bottom:5px}
+  .mval{font-family:var(--mono);font-size:clamp(21px,4.6vw,30px);font-weight:700;letter-spacing:-.02em;
+    line-height:1.05;font-variant-numeric:tabular-nums}
+  .now .mval{color:var(--navy)} .then .mval{color:var(--stale)}
+  .mstate{font-size:clamp(15px,2.6vw,18px);font-weight:700;letter-spacing:-.01em;line-height:1.2}
+  .now .mstate{color:var(--navy)} .then .mstate{color:var(--stale)}
+  .mnote{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+  .verdict{display:inline-block;font-size:11px;font-weight:700;padding:4px 8px;margin-top:8px;
+    border-radius:2px;line-height:1.3}
+  .v-ok{background:rgba(31,184,166,.15);color:var(--teal-d)}
+  .v-no{background:rgba(180,68,58,.13);color:var(--stale-ink)}
+  .v-warn{background:rgba(228,179,74,.24);color:var(--gold-ink)}
+
+  /* The flip. What animates is the MEANING changing, not the digits —
+     digits move constantly during a drag and animating them reads as noise. */
+  @keyframes flip{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  @keyframes wash{from{background:rgba(228,179,74,.28)}to{background:transparent}}
+  .verdict.flip{animation:flip .34s cubic-bezier(.2,.7,.3,1)}
+  .col.flip::after{content:"";position:absolute;inset:0;pointer-events:none;
+    animation:wash .62s ease-out forwards}
+  .mval.flip,.mstate.flip{animation:flip .34s cubic-bezier(.2,.7,.3,1)}
+
+  .delta{padding:15px 18px;background:var(--navy);color:#eaf1fa;font-size:13.5px;line-height:1.5;
+    display:flex;gap:13px;align-items:flex-start}
+  .delta .r{width:2px;background:var(--gold);align-self:stretch;flex-shrink:0;min-height:34px}
+  .delta b{color:var(--gold);font-weight:700}
+  .srcline{padding:11px 18px;background:var(--paper2);border-top:1px solid var(--line);
+    font-size:11px;color:var(--muted);line-height:1.55;word-break:break-word}
+  .srcline a{color:var(--teal-d)}
+
+  /* ── drift table ─────────────────────────────────── */
+  .drift{width:100%;border-collapse:collapse;margin-top:24px;font-size:14px;background:#fff;
+    border:1px solid var(--line)}
+  .drift th{text-align:left;padding:11px 14px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    border-bottom:1px solid var(--line);font-weight:700;background:var(--paper2)}
+  .drift td{padding:11px 14px;border-bottom:1px solid var(--hair);vertical-align:top;font-size:13.5px}
+  .drift tr:last-child td{border-bottom:none}
+  .was{color:var(--stale);text-decoration:line-through;font-family:var(--mono);font-size:13px}
+  .isnow{color:var(--navy);font-weight:700;font-family:var(--mono);font-size:13px}
+  .drift td:last-child{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+
+  /* ── receipt ─────────────────────────────────────── */
+  .receipt{background:var(--navy);margin-top:24px;overflow:hidden}
+  .rbar{background:#071628;padding:11px 16px;font-size:12.5px;color:#a8bcd6;display:flex;gap:9px;
+    align-items:flex-start;border-bottom:1px solid #1c3557;line-height:1.5}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:6px}
+  .rbody{padding:18px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.75;
+    overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .step{color:#7fb2ff;margin:15px 0 4px;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+  .step:first-child{margin-top:0}
+  .rline{color:#dce6f4;white-space:nowrap}
+  .rline .k{color:#a8bcd6}
+  .rhi{color:#4fd8c6;font-weight:700}
+  .rgold{color:var(--gold)}
+  .rflags{white-space:normal}
+  .rflag{color:#ffdcac;display:block;margin-top:5px;font-size:12px;line-height:1.55;padding-left:14px;
+    text-indent:-14px}
+
+  /* ── surfaces ────────────────────────────────────── */
+  .urlbox{background:var(--navy);color:#9fe7dd;padding:15px 17px;margin-top:22px;
+    font-family:var(--mono);font-size:12.5px;display:flex;justify-content:space-between;
+    align-items:center;gap:12px;flex-wrap:wrap;word-break:break-all}
+  .urlbox button{background:var(--teal);color:#00201c;border:none;padding:8px 16px;
+    font-weight:700;cursor:pointer;font-size:12px;font-family:var(--sans);border-radius:2px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(216px,1fr));gap:1px;
+    margin-top:22px;background:var(--line);border:1px solid var(--line)}
+  .card{background:#fff;padding:18px}
+  .card h3{margin-bottom:5px}
+  .card p{font-size:13px;color:#3b4a61;line-height:1.5}
+
+  /* ── inventory ───────────────────────────────────── */
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:20px;font-size:12px;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .legend i{width:3px;height:13px;background:var(--teal);display:block}
+  .legend i.sc{background:var(--gold)}
+  .inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:14px}
+  .skill{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);
+    padding:10px 12px}
+  .skill.scaffold{border-left-color:var(--gold);background:var(--paper2)}
+  .skill b{display:block;font-family:var(--mono);font-size:11.5px;font-weight:700;
+    margin-bottom:2px;word-break:break-all;color:var(--navy)}
+  .skill span{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.03em}
+
+  /* ── door ────────────────────────────────────────── */
+  .door{background:var(--navy);color:#fff;padding:clamp(26px,5vw,44px);margin-top:6px}
+  .door h2{color:#fff} .door p{color:#c8d7e9}
+  .form{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap}
+  .form input{flex:1;min-width:220px;padding:13px 15px;border:1px solid #2a4a72;border-radius:2px;
+    background:#0a1830;color:#fff;font-size:15px;font-family:var(--sans)}
+  .form input::placeholder{color:#7d93b2}
+  .form input:focus{border-color:var(--teal)}
+  .form button{padding:13px 24px;border:none;border-radius:2px;background:var(--teal);color:#00201c;
+    font-weight:700;font-size:15px;cursor:pointer;font-family:var(--sans)}
+  #formnote{font-size:12.5px;color:#a8bcd6;margin-top:12px;min-height:18px}
+
+  .note{background:#fff7e6;border:1px solid var(--gold);border-left-width:3px;padding:14px 16px;
+    font-size:13.5px;color:var(--gold-ink);margin-top:22px;line-height:1.55}
+  .foot{padding:40px 0;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.7}
+
+  @media(max-width:600px){
+    .wrap{padding:0 14px}
+    section{padding:52px 0}
+    .navlink{display:none}
+    .col{padding:16px 11px 18px}
+    .colsub{font-size:10px;min-height:42px}
+    .ask,.delta,.srcline,.ihead{padding-left:14px;padding-right:14px}
+    .verdict{font-size:10px;padding:3px 6px}
+    .mnote{font-size:10.5px}
+    /* Just the figure on the ticks — the descriptors would collide at this width. */
+    .tick em{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<div class="nav"><div class="wrap">
+  <div class="brand">MIA<i>·</i>Made in Africa</div>
+  <a class="navlink" href="#connect">Connect it to your AI →</a>
+</div></div>
+
+<!-- ═══ 01 · THE INSTRUMENT ═════════════════════════ -->
+<header class="hero"><div class="wrap">
+  <p class="preamble">This page is not a description of MIA. <b>It is MIA.</b></p>
+  <h1>Your tax position,<br>as at this morning.</h1>
+  <p class="lead">Not from a model's memory. From South African law, read at the source, with the
+    date it was checked printed next to the answer.</p>
+
+  <noscript>
+    <div class="nojs"><b>JavaScript is off,</b> so the controls below won't move. The figures shown are
+      the worked example for a turnover of R1 400 000 — the comparison itself is real, and the sources
+      are linked underneath it.</div>
+  </noscript>
+
+  <div class="instrument">
+    <div class="ihead">
+      <span class="b">MIA<i>·</i>Turnover tax &amp; VAT</span>
+      <span class="d">SARS &amp; National Treasury · verified 30 July 2026</span>
+    </div>
+
+    <div class="ask">
+      <label for="turnover">What did your business turn over in the last 12 months?</label>
+      <div class="inputrow">
+        <span class="rand">R</span>
+        <input id="turnover" type="text" inputmode="numeric" value="1 400 000"
+               aria-label="Annual turnover in rand" autocomplete="off">
+      </div>
+      <div class="scale">
+        <input id="slider" type="range" min="0" max="5000000" step="50000" value="1400000"
+               aria-label="Annual turnover" aria-valuetext="R1 400 000">
+        <span class="tick old" id="tick-old" style="left:20%"><i></i><span>R1m<em> · old limit</em></span></span>
+        <span class="tick" id="tick-new" style="left:46%"><i></i><span>R2.3m<em> · limit now</em></span></span>
+      </div>
+      <div class="chips" role="group" aria-label="Example turnover figures">
+        <button type="button" class="chip" data-v="450000" aria-pressed="false">R450k</button>
+        <button type="button" class="chip" data-v="900000" aria-pressed="false">R900k</button>
+        <button type="button" class="chip" data-v="1400000" aria-pressed="true">R1.4m</button>
+        <button type="button" class="chip" data-v="2300000" aria-pressed="false">R2.3m</button>
+        <button type="button" class="chip" data-v="3500000" aria-pressed="false">R3.5m</button>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="col now" id="col-now">
+        <span class="coltitle">MIA · today's rules</span>
+        <span class="colsub">Read off SARS, 30 July 2026</span>
+        <div class="metric">
+          <div class="mlabel">Turnover tax</div>
+          <div class="mval" id="n-tax">R12,500</div>
+          <div class="mnote" id="n-band">R3,500 + 2% of turnover above R950,000</div>
+          <span class="verdict v-ok" id="n-qual">Qualifies · under R2.3m</span>
+        </div>
+        <div class="metric">
+          <div class="mlabel">VAT registration</div>
+          <div class="mstate" id="n-vat">Voluntary</div>
+          <div class="mnote" id="n-vatnote">Above R120,000, below the R2.3m compulsory threshold</div>
+        </div>
+      </div>
+
+      <div class="col then" id="col-then">
+        <span class="coltitle">Answering from memory</span>
+        <span class="colsub">Pre-April 2026 rules — what most tools still believe</span>
+        <div class="metric">
+          <div class="mlabel">Turnover tax</div>
+          <div class="mval" id="o-tax">R26,150</div>
+          <div class="mnote" id="o-band">Old bands: R6,650 + 3% of turnover above R750,000</div>
+          <span class="verdict v-no" id="o-qual">Does not qualify · over R1m</span>
+        </div>
+        <div class="metric">
+          <div class="mlabel">VAT registration</div>
+          <div class="mstate" id="o-vat">Compulsory</div>
+          <div class="mnote" id="o-vatnote">Old R1m threshold — 21 business days to register</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="delta"><span class="r"></span>
+      <span id="deltatext">At R1,400,000 the two answers aren't <b>different amounts</b> —
+      they're <b>different outcomes</b>. The stale one says you don't qualify at all.</span></div>
+
+    <div class="srcline">
+      Sources: <a href="https://www.sars.gov.za/tax-rates/turnover-tax/" target="_blank" rel="noopener">SARS turnover tax rates</a> ·
+      <a href="https://www.sars.gov.za/types-of-tax/value-added-tax/register-for-vat/" target="_blank" rel="noopener">SARS VAT registration</a>
+      — both checked 30 July 2026. Budget 2026 raised both thresholds to R2.3m effective 1 April 2026.
+      A calculation, not tax advice.
+    </div>
+  </div>
+  <p class="sr-only" id="live" role="status" aria-live="polite"></p>
+</div></header>
+
+<!-- ═══ 02 · WHY THEY DISAGREE ══════════════════════ -->
+<section id="drift"><div class="wrap">
+  <div class="kicker">02 · Why they disagree</div>
+  <h2>Four numbers moved this year. Most tools never noticed.</h2>
+  <p class="lead">Budget 2026 rewrote the thresholds that decide whether a small South African business
+    registers, qualifies, or pays. Any tool answering from training data is quoting the old ones.</p>
+
+  <table class="drift">
+    <thead><tr><th scope="col">Rule</th><th scope="col">Was</th><th scope="col">Now</th><th scope="col">Since</th></tr></thead>
+    <tbody>
+      <tr><td>Turnover tax qualifying limit</td><td class="was">R1 000 000</td><td class="isnow">R2 300 000</td><td>1 Apr 2026</td></tr>
+      <tr><td>VAT compulsory registration</td><td class="was">R1 000 000</td><td class="isnow">R2 300 000</td><td>1 Apr 2026</td></tr>
+      <tr><td>VAT voluntary minimum</td><td class="was">R50 000</td><td class="isnow">R120 000</td><td>1 Apr 2026</td></tr>
+      <tr><td>Carbon tax per tonne CO₂e</td><td class="was">R236</td><td class="isnow">R308</td><td>1 Jan 2026</td></tr>
+    </tbody>
+  </table>
+
+  <p class="small" style="margin-top:16px">Every one of these was read off a live SARS or National Treasury
+    page and written into the code with its URL and the date it was checked. When they move again,
+    the tests fail loudly.</p>
+</div></section>
+
+<!-- ═══ 03 · THE RECEIPT ════════════════════════════ -->
+<section id="receipt"><div class="wrap">
+  <div class="kicker">03 · Show your working</div>
+  <h2>Every number arrives with a paper trail.</h2>
+  <p class="lead">A general AI gives you a figure. MIA gives you the figure, the rule it came from, the page
+    it was read on, the date it was read — and the parts it refuses to pretend it can do for you.</p>
+
+  <div class="receipt">
+    <div class="rbar"><span class="dot"></span>
+      <span>founder asks: “I'm hiring at R30,000 a month — she's 40, three people on her medical aid.”</span></div>
+    <div class="rbody">
+      <div class="step">tool called</div>
+      <div class="rline">paye_calculate_monthly_paye <span class="k">(monthly_salary: 30000, age: 40, medical_scheme_members: 3)</span></div>
+
+      <div class="step">constants applied</div>
+      <div class="rline"><span class="k">2027 tax table</span> · 18%→45%, top band above R1,878,600</div>
+      <div class="rline"><span class="k">primary rebate</span> R17,820 <span class="k">· medical credits</span> R376 / R752 / R254 pm</div>
+      <div class="rline"><span class="k">UIF</span> 1% capped at R17,712 pm</div>
+
+      <div class="step">result</div>
+      <div class="rline">monthly PAYE <span class="rhi">R3,675.00</span></div>
+      <div class="rline">UIF (employee) <span class="rhi">R177.12</span> <span class="k">— capped</span></div>
+      <div class="rline">take-home <span class="rgold">R26,147.88</span></div>
+
+      <div class="step">will not do for you</div>
+      <div class="rflags">
+        <span class="rflag">▸ Employer PAYE registration with SARS, monthly declarations and payment deadlines</span>
+        <span class="rflag">▸ UIF registration with the Department of Employment and Labour — a separate obligation</span>
+        <span class="rflag">▸ Bonuses, allowances, fringe benefits and retirement deductions change this — confirm with a payroll provider</span>
+      </div>
+
+      <div class="step">rule basis</div>
+      <div class="rline"><span class="k">last verified</span> July 2026 · <span class="k">this is a calculation, not tax advice</span></div>
+    </div>
+  </div>
+
+  <div class="note"><b>Why the last section matters.</b> Most tools are rewarded for sounding complete.
+    MIA is built to say what it can't do — because a founder who trusts a wrong filing deadline loses money,
+    and a tool that hides its limits only gets caught once.</div>
+</div></section>
+
+<!-- ═══ 04 · SURFACES ═══════════════════════════════ -->
+<section id="connect"><div class="wrap">
+  <div class="kicker">04 · Where it runs</div>
+  <h2>You don't come to MIA. MIA comes to you.</h2>
+  <p class="lead">There's no app to learn and nothing to install. MIA plugs into the AI tool you already
+    have open — one address, pasted once.</p>
+
+  <div class="urlbox">
+    <span id="gwurl">https://mia-skills-gateway.onrender.com/mcp</span>
+    <button type="button" onclick="copyUrl()" id="copybtn">Copy</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>Claude</h3><p>Settings → Connectors → add the URL. Then ask in plain language,
+      in any of your languages.</p></div>
+    <div class="card"><h3>ChatGPT</h3><p>Custom connector on Plus and above. Same address, same answers.</p></div>
+    <div class="card"><h3>Cursor &amp; custom agents</h3><p>Standard MCP over HTTP. Build MIA into your own product.</p></div>
+    <div class="card"><h3>WhatsApp <span class="small">— next</span></h3><p>Where founders actually are.
+      Scoped to these tasks, by design and by Meta's rules.</p></div>
+  </div>
+</div></section>
+
+<!-- ═══ 05 · WHAT'S REAL ════════════════════════════ -->
+<section id="real"><div class="wrap">
+  <div class="kicker">05 · Honest inventory</div>
+  <h2>Seven live. Ten scaffolded. Nothing pretended.</h2>
+  <p class="lead">Live means every tool implemented and every constant verified against a primary source.
+    Scaffold means the shape exists and the work doesn't — and it says so when you call it.</p>
+
+  <div class="legend">
+    <span><i></i> Live — implemented, verified, tested</span>
+    <span><i class="sc"></i> Scaffold — returns a structured not-implemented response</span>
+  </div>
+
+  <div class="inv">
+    <div class="skill"><b>turnover-tax</b><span>Live · 31 tests · SARS</span></div>
+    <div class="skill"><b>vat-registration</b><span>Live · 19 tests · SARS</span></div>
+    <div class="skill"><b>paye + uif</b><span>Live · 21 tests · SARS</span></div>
+    <div class="skill"><b>provisional-tax</b><span>Live · 24 tests · SARS</span></div>
+    <div class="skill"><b>section-12b-solar</b><span>Live · 21 tests · SARS</span></div>
+    <div class="skill"><b>sdl</b><span>Live · 15 tests · SARS</span></div>
+    <div class="skill"><b>carbon-tax</b><span>Live · 15 tests · Treasury</span></div>
+    <div class="skill scaffold"><b>register-company-za</b><span>Scaffold · CIPC</span></div>
+    <div class="skill scaffold"><b>reserve-company-name</b><span>Scaffold · CIPC</span></div>
+    <div class="skill scaffold"><b>annual-return</b><span>Scaffold · CIPC</span></div>
+    <div class="skill scaffold"><b>uif-registration</b><span>Scaffold · Labour</span></div>
+    <div class="skill scaffold"><b>tax-clearance</b><span>Scaffold · SARS</span></div>
+    <div class="skill scaffold"><b>bbbee-affidavit</b><span>Scaffold · the dtic</span></div>
+    <div class="skill scaffold"><b>grant-eligibility</b><span>Scaffold · SEDA/SEFA</span></div>
+    <div class="skill scaffold"><b>register-company-kenya</b><span>Scaffold · BRS</span></div>
+    <div class="skill scaffold"><b>register-company-nigeria</b><span>Scaffold · CAC</span></div>
+    <div class="skill scaffold"><b>afcfta-tariff</b><span>Scaffold · AfCFTA</span></div>
+  </div>
+
+  <p class="small" style="margin-top:18px">238 automated tests across the library, run on every change.
+    Open source under Apache 2.0 — anyone can read the rules, check the sources, or contribute a jurisdiction.</p>
+</div></section>
+
+<!-- ═══ 06 · THE DOOR ═══════════════════════════════ -->
+<section style="border-bottom:none"><div class="wrap">
+  <div class="door">
+    <div class="kicker" style="color:var(--gold)">06 · Early access</div>
+    <h2>Built in Africa, for the people building it.</h2>
+    <p style="margin-top:12px;max-width:600px">Seven tools live today, across tax, payroll and compliance.
+      Company registration, grants and cross-border trade are next — South Africa first, then Kenya,
+      Nigeria, and the AfCFTA lanes between them.</p>
+    <form class="form" onsubmit="joinList(event)">
+      <label class="sr-only" for="email">Email address</label>
+      <input type="email" id="email" placeholder="you@yourcompany.co.za" required>
+      <button type="submit">Get early access</button>
+    </form>
+    <div id="formnote">No spam. One note when the next jurisdiction goes live.</div>
+  </div>
+</div></section>
+
+<div class="foot"><div class="wrap">
+  MIA · Made in Africa — the operating layer for African business<br>
+  <span style="opacity:.8">Calculations, not tax advice. Always confirm with a registered practitioner
+  before filing. Built with The Aquarius Foundation.</span>
+</div></div>
+
+<script>
+/* MIA:GENERATED-CONSTANTS:START — do not hand-edit between these sentinels.
+   Rewritten by scripts/gen_web_constants.py from the Python skills; a CI
+   check asserts they match. Design changes outside the sentinels only. */
+/* ─────────────────────────────────────────────────────────────
+   GENERATED CONSTANTS — mirrored from the Python skills.
+   Source of truth:
+     skills/calculate-turnover-tax-south-africa/server.py
+     skills/check-vat-registration-south-africa/server.py
+   Generated 1 August 2026. If those constants change, regenerate.
+   When this page is served by deploy/agent, it prefers the live
+   API below and these are only the offline fallback.
+   ───────────────────────────────────────────────────────────── */
+const T2027 = [[600000,0,0.01],[950000,3500,0.02],[1400000,12500,0.03]];
+const T2026 = [[335000,0,0.01],[500000,1650,0.02],[750000,6650,0.03]];
+const LIMIT_NOW = 2300000, LIMIT_OLD = 1000000;
+const VAT_NOW = 2300000, VAT_VOL_NOW = 120000;
+const VAT_OLD = 1000000, VAT_VOL_OLD = 50000;
+/* MIA:GENERATED-CONSTANTS:END */
+
+const MAX = 5000000;
+
+function bracketTax(amount, table){          // mirrors _bracket_tax() exactly
+  let tax = 0;
+  for (const [floor, base, rate] of table) if (amount > floor) tax = base + rate * (amount - floor);
+  return tax;
+}
+function bandLabel(amount, table){
+  if (amount <= table[0][0]) return "R0 – R" + fmt(table[0][0]) + ": 0% (tax-free band)";
+  let b = table[0];
+  for (const row of table) if (amount > row[0]) b = row;
+  const [floor, base, rate] = b;
+  return (base ? "R" + fmt(base) + " + " : "") + Math.round(rate*100) + "% of turnover above R" + fmt(floor);
+}
+const fmt = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const rand = n => "R" + fmt(n);
+const $ = id => document.getElementById(id);
+
+/* Replay a CSS animation on an element that has just changed meaning. */
+function pulse(el){
+  if (!el) return;
+  el.classList.remove("flip");
+  void el.offsetWidth;                        // force reflow so the animation restarts
+  el.classList.add("flip");
+}
+
+/* Previous verdicts, so we only animate when an OUTCOME flips — not on every
+   digit of a drag, which would read as noise rather than significance. */
+let prev = {nq:null, oq:null, nv:null, ov:null};
+let liveTimer;
+
+function render(v){
+  /* ── MIA, current rules ── */
+  const taxNow = bracketTax(v, T2027);
+  $("n-tax").textContent = rand(taxNow);
+  $("n-band").textContent = bandLabel(v, T2027);
+  const overNow = v > LIMIT_NOW;
+  const qn = $("n-qual");
+  qn.className = "verdict " + (overNow ? "v-no" : "v-ok");
+  qn.textContent = overNow ? "Does not qualify · over R2.3m" : "Qualifies · under R2.3m";
+
+  let vatNow, vatNoteNow;
+  if (v > VAT_NOW){ vatNow = "Compulsory"; vatNoteNow = "Over R2.3m — register within 21 business days"; }
+  else if (v > VAT_VOL_NOW){ vatNow = "Voluntary"; vatNoteNow = "Above R120,000, below the R2.3m compulsory threshold"; }
+  else { vatNow = "Not yet"; vatNoteNow = "Under R120,000 — other routes may still apply"; }
+  $("n-vat").textContent = vatNow; $("n-vatnote").textContent = vatNoteNow;
+
+  /* ── the stale answer ── */
+  const taxOld = bracketTax(v, T2026);
+  $("o-tax").textContent = rand(taxOld);
+  $("o-band").textContent = "Old bands: " + bandLabel(v, T2026);
+  const overOld = v > LIMIT_OLD;
+  const qo = $("o-qual");
+  qo.className = "verdict " + (overOld ? "v-no" : "v-warn");
+  qo.textContent = overOld ? "Does not qualify · over R1m" : "Qualifies · under R1m";
+
+  let vatOld, vatNoteOld;
+  if (v > VAT_OLD){ vatOld = "Compulsory"; vatNoteOld = "Old R1m threshold — 21 business days to register"; }
+  else if (v > VAT_VOL_OLD){ vatOld = "Voluntary"; vatNoteOld = "Old R50,000 voluntary minimum"; }
+  else { vatOld = "Not yet"; vatNoteOld = "Under the old R50,000 minimum"; }
+  $("o-vat").textContent = vatOld; $("o-vatnote").textContent = vatNoteOld;
+
+  /* ── the flip: animate only what changed meaning ── */
+  if (prev.nq !== null){
+    if (overNow !== prev.nq){ pulse(qn); pulse($("n-tax")); pulse($("col-now")); }
+    if (overOld !== prev.oq){ pulse(qo); pulse($("o-tax")); pulse($("col-then")); }
+    if (vatNow !== prev.nv) pulse($("n-vat"));
+    if (vatOld !== prev.ov) pulse($("o-vat"));
+  }
+  prev = {nq:overNow, oq:overOld, nv:vatNow, ov:vatOld};
+
+  /* ── the gap, stated plainly ── */
+  const d = taxOld - taxNow;
+  let msg;
+  if (overOld && !overNow)
+    msg = "At " + rand(v) + " the two answers aren't <b>different amounts</b> — they're <b>different outcomes</b>. " +
+          "The stale one says you don't qualify at all.";
+  else if (vatNow !== vatOld)
+    msg = "Same turnover, <b>opposite VAT obligation</b>. One of these gets you a penalty; the other gets you a refund you never claimed.";
+  else if (d > 0)
+    msg = "The old rules overcharge this business by <b>" + rand(d) + "</b> a year — " +
+          Math.round(d / Math.max(taxOld,1) * 100) + "% too much.";
+  else
+    msg = "Both answers agree here. <b>They stop agreeing above R750,000</b> — move the slider.";
+  $("deltatext").innerHTML = msg;
+
+  /* slider fill + spoken summary */
+  $("slider").style.setProperty("--pct", (v / MAX * 100) + "%");
+  $("slider").setAttribute("aria-valuetext", "R" + fmt(v).replace(/,/g, " "));
+  clearTimeout(liveTimer);
+  liveTimer = setTimeout(() => {
+    $("live").textContent =
+      "At " + rand(v) + ": today's rules, " + rand(taxNow) + ", " + qn.textContent + ", VAT " + vatNow +
+      ". Pre-April 2026 rules, " + rand(taxOld) + ", " + qo.textContent + ", VAT " + vatOld + ".";
+  }, 400);
+}
+
+function setValue(v, fromInput){
+  v = Math.max(0, Math.min(MAX, v || 0));
+  if (!fromInput) $("turnover").value = fmt(v).replace(/,/g, " ");
+  $("slider").value = v;
+  document.querySelectorAll(".chip").forEach(c =>
+    c.setAttribute("aria-pressed", +c.dataset.v === v ? "true" : "false"));
+  render(v);
+}
+
+/* Put the threshold ticks exactly where the generated constants say they are,
+   so the scale can never drift from the rules it is marking. */
+$("tick-old").style.left = (LIMIT_OLD / MAX * 100) + "%";
+$("tick-new").style.left = (LIMIT_NOW / MAX * 100) + "%";
+
+$("slider").addEventListener("input", e => setValue(+e.target.value));
+$("turnover").addEventListener("input", e => setValue(+e.target.value.replace(/[^\d]/g, ""), true));
+$("turnover").addEventListener("blur", e => setValue(+e.target.value.replace(/[^\d]/g, "")));
+document.querySelectorAll(".chip").forEach(c =>
+  c.addEventListener("click", () => setValue(+c.dataset.v)));
+
+function copyUrl(){
+  const url = $("gwurl").textContent.trim();
+  navigator.clipboard?.writeText(url).then(() => {
+    const b = $("copybtn"); b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1600);
+  });
+}
+
+function joinList(e){
+  e.preventDefault();
+  const email = $("email").value;
+  $("formnote").textContent = "Thanks — " + email + " is on the list. (Not yet wired to a mailing list.)";
+  $("formnote").style.color = "#9fe7dd";
+}
+
+setValue(1400000);
+</script>
+</body>
+</html>
